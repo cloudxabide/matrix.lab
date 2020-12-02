@@ -2,18 +2,18 @@
 STATUS:  Work in Progress.  Trying to make this less dependent on the host it's running on and PULL 
            everything needed for all the tasks.
 
-```
-THEDATE=`date +%F-%H%M`
-OCP4DIR=${HOME}/OCP4/${CLUSTER_NAME}.${BASE_DOMAIN}-${THEDATE}
-```
+
+## Pre-reqs 
+NOTE:  you don't *always* need to do this part.  It is here (mostly) as a reference.
  
-## Download the Installer and Client
+### Download the Installer and Client
+
 ```
 # TODO: instead of doing an rm, figure out how to rename it based on the version or something
 FILES="openshift-install-linux.tar.gz openshift-client-linux.tar.gz"
 for FILE in $FILES
 do 
-  mv $FILE $FILE-$THEDATE
+  mv $FILE $FILE-`date +%F`
 done
 
 case OS in 
@@ -30,10 +30,21 @@ esac
 for FILE in openshift-install-*.tar.gz openshift-client-*.tar.gz; do tar -xvzf $FILE; done
 ```
 
-## Install the certs from VMware vCenter
+## SET ENVIRONMENT VARS
 ```
-wget --no-check-certificate https://vmw-vcenter6.matrix.lab/certs/download.zip
-unzip download.zip -d $OCP4DIR/
+THEDATE=`date +%F-%H%M`
+CLUSTER_NAME=ocp4-mwn
+BASE_DOMAIN=linuxrevolution.com
+OCP4DIR=${HOME}/OCP4/${CLUSTER_NAME}.${BASE_DOMAIN}-${THEDATE}
+VC_HOSTNAME=vmw-vcenter6.matrix.lab
+```
+
+## Install the certs from VMware vCenter
+You likely won't need to do this, it's just for reference.
+```
+CERT_BUNDLE=${VC_HOSTNAME}-${THEDATE}.zip
+curl -k https://${VC_HOSTNAME}/certs/download.zip -o ${CERT_BUNDLE}
+unzip ${CERT_BUNDLE} -d $OCP4DIR/
 cp  $OCP4DIR/certs/lin/*.0 /etc/pki/ca-trust/source/anchors/
 update-ca-trust extract
 ```
@@ -43,16 +54,14 @@ update-ca-trust extract
 cd ${HOME}/OCP4/
 tmux new -s OCP4install || tmux attach -t OCP4install
 
-CLUSTER_NAME=ocp4-mwn
-BASE_DOMAIN=linuxrevolution.com
-#BASE_DOMAIN=matrix.lab
+# MAKE SURE YOU SET VARS (above ^^)
 nslookup api.${CLUSTER_NAME}.${BASE_DOMAIN}
 nslookup *.apps.${CLUSTER_NAME}.${BASE_DOMAIN}
 
 eval "$(ssh-agent -s)"
 ssh-add /root/.ssh/id_rsa
 sed -i -e '/^10.10/d' ~/.ssh/known_hosts
-THEDATE=`date +%F-%H%M`; OCP4DIR=${CLUSTER_NAME}.${BASE_DOMAIN}-${THEDATE}; mkdir $OCP4DIR
+[ ! -d $OCP4DIR ] && { echo "NOTE: Making ${OCP4DIR}"; mkdir $OCP4DIR; } || echo "NOTE: $OCP4DIR already exists"
 
 # The following creates the "install-config" - copy it out of the directory
 #./openshift-install create install-config --dir=${OCP4DIR}/ --log-level=info
@@ -66,6 +75,37 @@ If you'd like to create an install configuration, or already have an existing in
 ```
 cp install-config-vsphere.yaml $OCP4DIR/install-config.yaml
 ```
+
+## Troubleshooting the Install
+This is a work in progress  
+
+It appears that initially you will initially see:
+* "Golden Image" (rhcos) node
+* Masters
+* Bootstrap
+
+It is normal to see the API timeouts (around 5 times seems "normal"
+```
+time="2020-12-02T11:46:22-06:00" level=info msg="Waiting up to 20m0s for the Kubernetes API at https://api.ocp4-mwn.linuxrevolution.com:6443..."
+time="2020-12-02T11:46:25-06:00" level=debug msg="Still waiting for the Kubernetes API: Get \"https://api.ocp4-mwn.linuxrevolution.com:6443/version?timeout=32s\": dial tcp 10.10.10.161:6443: connect: no route to host"
+time="2020-12-02T11:47:10-06:00" level=debug msg="Still waiting for the Kubernetes API: Get \"https://api.ocp4-mwn.linuxrevolution.com:6443/version?timeout=32s\": dial tcp 10.10.10.161:6443: connect: no route to host"
+time="2020-12-02T11:47:55-06:00" level=debug msg="Still waiting for the Kubernetes API: Get \"https://api.ocp4-mwn.linuxrevolution.com:6443/version?timeout=32s\": dial tcp 10.10.10.161:6443: connect: no route to host"
+time="2020-12-02T11:48:18-06:00" level=debug msg="Still waiting for the Kubernetes API: Get \"https://api.ocp4-mwn.linuxrevolution.com:6443/version?timeout=32s\": dial tcp 10.10.10.161:6443: connect: connection refused"
+time="2020-12-02T11:48:21-06:00" level=info msg="API v1.19.0+d59ce34 up"
+```
+Then, eventually you will see the worker nodes spinning up.
+
+```
+ssh core@(IP OF BOOTSTRAP)
+journalctl -b -f -u bootkube.service
+```
+Also, I find the DHCPD logs to be helpful
+Note you should see requests from nodes sending "clustername-clusterID-{master,worker}-randomID"
+```
+journalctl -f -u dhcpd
+Dec 02 12:11:19 rh7-sat6-srv01.matrix.lab dhcpd[9566]: DHCPREQUEST for 10.10.10.199 from 00:50:56:a5:40:2e (ocp4-mwn-kkdz5-worker-rnphr) via ens192
+```
+
 
 ## OCP4 on RHV (RHHI-V)
 Status:  Untested.  I do not have an environment to test this with yet.

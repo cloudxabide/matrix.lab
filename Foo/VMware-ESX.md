@@ -64,8 +64,8 @@ https://www.virtuallyghetto.com/2016/07/automating-the-import-of-vcenter-server-
 NOTE/WARNING:  OF course you should review the script I am recommending (and teh following steps)  
 ```
 wget https://raw.githubusercontent.com/lamw/vghetto-scripts/master/shell/import-vcrootcertificate.sh
-wget https://fqdn_of_vca/certs/download.zip
-unzip downloads.zip; cd certs/mac;
+wget --no-check-certificate https://vmw-vcenter6.matrix.lab/certs/download.zip
+unzip download.zip; cd certs/mac;
 ./import-vcrootcertificate.sh
 
 ```
