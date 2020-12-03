@@ -2,12 +2,10 @@
 STATUS:  Work in Progress.  Trying to make this less dependent on the host it's running on and PULL 
            everything needed for all the tasks.
 
-
 ## Pre-reqs 
 NOTE:  you don't *always* need to do this part.  It is here (mostly) as a reference.
  
 ### Download the Installer and Client
-
 ```
 # TODO: instead of doing an rm, figure out how to rename it based on the version or something
 FILES="openshift-install-linux.tar.gz openshift-client-linux.tar.gz"
@@ -30,7 +28,8 @@ esac
 for FILE in openshift-install-*.tar.gz openshift-client-*.tar.gz; do tar -xvzf $FILE; done
 ```
 
-## SET ENVIRONMENT VARS
+## Typical OCP4 Install
+### Set ENVIRONMENT VARS
 ```
 THEDATE=`date +%F-%H%M`
 CLUSTER_NAME=ocp4-mwn
@@ -53,8 +52,8 @@ update-ca-trust extract
 ```
 cd ${HOME}/OCP4/
 tmux new -s OCP4install || tmux attach -t OCP4install
+# NOTE:  after attaching to TMUX, make sure you reset the VARS (above ^^)
 
-# MAKE SURE YOU SET VARS (above ^^)
 nslookup api.${CLUSTER_NAME}.${BASE_DOMAIN}
 nslookup *.apps.${CLUSTER_NAME}.${BASE_DOMAIN}
 
@@ -141,7 +140,7 @@ I have a bit of an intersting situation - my HomeLab has it's own DNS (matrix.la
 ? Pull Secret [? for help]
 ```
 
-oc login -u kubeadmin -p `cat $(find $OCP4DIR/*mwn* -name kubeadmin-password)`  https://api.ocp4-mwn.matrix.lab:6443/
+oc login -u kubeadmin -p `cat $(find $OCP4DIR/*mwn* -name kubeadmin-password)`  https://api.ocp4-mwn.linuxrevolution.com:6443/
 
 ## Login to the Environment
 
@@ -232,11 +231,19 @@ oc edit machineset -n openshift-machine-api
           numCPUs: 2
           numCoresPerSocket: 2
 ```
+Then scale-down and scale-up
+```
+MACHINESET=$(oc get machineset -n openshift-machine-api | grep -v ^NAME | awk '{ print $1 }')
+oc scale --replicas=0 machineset $MACHINESET  -n openshift-machine-api
+
+
 
 ## Customize the OpenShift Console logo
 
 ```
 wget https://github.com/cloudxabide/matrix.lab/raw/master/images/LinuxRevolution_RedGradient.png -O ${OCP4DIR}/LinuxRevolution_RedGradient.png
+wget https://github.com/cloudxabide/matrix.lab/raw/main/images/LinuxRevolution_RedGradient.png -O ${OCP4DIR}/LinuxRevolution_RedGradient.png
+
 oc create configmap console-custom-logo --from-file ${OCP4DIR}/LinuxRevolution_RedGradient.png  -n openshift-config
 oc edit console.operator.openshift.io cluster
 # Update spec: customization: customLogoFile: {key,name}:
@@ -248,9 +255,16 @@ oc edit console.operator.openshift.io cluster
 ```
 
 ## Add htpasswd 
+### Create an HTPASSWD file
+
 ```
-wget https://raw.githubusercontent.com/cloudxabide/matrix.lab/master/Files/ocp4-idp-htpasswd -O ${OCP4DIR}/ocp4-idp-htpasswd
-oc create secret generic htpass-secret --from-file=htpasswd=${OCP4DIR}/ocp4-idp-htpasswd  -n openshift-config
+PASSWORD=""
+HTPASSWD_FILE=${OCP4DIR}/htpasswd
+
+htpasswd -b -c $HTPASSWD_FILE morpheus $PASSWORD
+htpasswd -b $HTPASSWD_FILE ocpguest $PASSWORD
+
+oc create secret generic htpass-secret --from-file=htpasswd=${HTPASSWD_FILE} -n openshift-config
 cat << EOF > ${OCP4DIR}/HTPasswd-CR
 apiVersion: config.openshift.io/v1
 kind: OAuth
@@ -271,7 +285,7 @@ oc apply -f ${OCP4DIR}/HTPasswd-CR
 
 ## Add Legit Certs
 review [LetsEncrypt-HowTo](./lets_encrypt.md)  
-NOTE:  This *should* be done with CertManager.
+NOTE:  This *should* be done with CertManager (some time in the future).
 
 ## References
 https://www.virtuallyghetto.com/2020/07/using-the-new-installation-method-for-deploying-openshift-4-5-on-vmware-cloud-on-aws.html
@@ -300,10 +314,10 @@ rm -rf /mnt/raidZ/nfs-registry/docker
 ```
 export KUBECONFIG=$(find ~/OCP4/*acm* -name kubeconfig)
 cat $(find ~/OCP4/*acm* -name kubeadmin-password)
-oc login -u kubeadmin -p `cat $(find ${HOME}/OCP4/*acm* -name kubeadmin-password)`  https://api.ocp4-acm.matrix.lab:6443/
+oc login -u kubeadmin -p `cat $(find ${HOME}/OCP4/*acm* -name kubeadmin-password)`  https://api.ocp4-acm.linuxrevolution.com:6443/
 
 export KUBECONFIG=$(find ~/OCP4/*mwn* -name kubeconfig)
 cat $(find ~/OCP4/*mwn* -name kubeadmin-password)
-oc login -u kubeadmin -p `cat $(find ${HOME}/OCP4/*mwn* -name kubeadmin-password)`  https://api.ocp4-mwn.matrix.lab:6443/
+oc login -u kubeadmin -p `cat $(find ${HOME}/OCP4/*mwn* -name kubeadmin-password)`  https://api.ocp4-mwn.linuxrevolution.com:6443/
 
 

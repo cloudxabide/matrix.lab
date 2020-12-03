@@ -14,6 +14,11 @@ My environment is a home lab which has a single ingress/egress point and a singl
 I'm not going to provide details on how to install RHEL, nor LetsEncrypt - mostly because there are *plenty* of docs out there, and the moment I run "git push" my docs will probably be out of date.  
 
 Create your top-level domain (TLD) in AWS Route53 (and ONLY your TLD).  This actually took me a bit to figure out, as it is NOT intuitive.  You start with your TLD with no reference to OCP.  Then create your certs (which creates a bunch of entries (TXT records) and then removes them.  Once complete, you will need to then create your 2 x A records (api.<cluster_name>.<domain> and *.apps.<cluster_name>.<domain>).  NOTE:  You *can* create subdomains from your TLD, but it's a bit of a PITA (and not worth it, IMO, since we only need 2 static IP entries).
+## Pre-reqs
+```
+export CERTDIR=$HOME/certificates
+[ ! -d ${CERTDIR} ] && mkdir -p ${CERTDIR} 
+```
 
 ## LetsEncrypt using AWS CLI
 NOTE:  This is NOT my stuff (acme.sh) - use with caution
@@ -37,23 +42,30 @@ echo "API Endpoint: $LE_API"
 echo "Apps Wildcard: $LE_WILDCARD"
 
 issue_new_cert() {
-echo "${HOME}/acme.sh/acme.sh --issue -d ${LE_API} -d *.${LE_WILDCARD} -d *.${LE_TLD} --dns dns_aws"
-${HOME}/acme.sh/acme.sh --issue -d ${LE_API} -d *.${LE_WILDCARD} -d *.${LE_TLD} --dns dns_aws
+  echo "${HOME}/acme.sh/acme.sh --issue -d ${LE_API} -d *.${LE_WILDCARD} -d *.${LE_TLD} --dns dns_aws"
+  ${HOME}/acme.sh/acme.sh --issue -d ${LE_API} -d *.${LE_WILDCARD} -d *.${LE_TLD} --dns dns_aws
 }
 
-export CERTDIR=$HOME/certificates
-mkdir -p ${CERTDIR}
 ${HOME}/acme.sh/acme.sh --install-cert -d ${LE_API} -d *.${LE_WILDCARD} -d *.${LE_TLD} --cert-file ${CERTDIR}/cert.pem --key-file ${CERTDIR}/key.pem --fullchain-file ${CERTDIR}/fullchain.pem --ca-file ${CERTDIR}/ca.cer
+```
+
+## OpenShift Commands
+This section details what is needed on the OCP side 
+```
+for FILE in fullchain.pem key.pem
+do 
+  file ${CERTDIR}/$FILE || { echo "ERROR: $FILE not found"; }
+done
 
 oc create secret tls router-certs --cert=${CERTDIR}/fullchain.pem --key=${CERTDIR}/key.pem -n openshift-ingress
 oc patch ingresscontroller default -n openshift-ingress-operator --type=merge --patch='{"spec": { "defaultCertificate": { "name": "router-certs" }}}'
 
-# WARNING - this has limited testing at this point.
+# WARNING - this has limited testing at this point.  It appears to work though.
 oc create secret tls api-certs --cert=${CERTDIR}/fullchain.pem --key=${CERTDIR}/key.pem -n openshift-config
 oc patch apiserver cluster --type=merge --patch='{"spec": { "servingCerts": {"namedCertificates": [{"names": ["api.ocp4-mwn.linuxrevolution.com"], "servingCertificate": {"name": "api-certs" }}]}}}'
 
-# Cleanup (start over)
-oc delete secret lts router-certs -n openshift-ingress
+# Cleanup (start over - remove the comment signs to use this command)
+# oc delete # secret # lts # router-certs -n # openshift-ingress
 ```
 
 ###
@@ -67,10 +79,11 @@ I had attempted to do all this by manually creating my certs, etc... thankfully 
 * --cert=/root/OCP4/Certs/cert1.pem  
 * --key=/root/OCP4/Certs/privkey1.pem  
 
-You will get 4 files from LetsEncrypt in /etc/letsencrypt/archive 
+You will get 4 files from LetsEncrypt in /etc/letsencrypt/archive i 
+
 cert1.pem <- certfile  
 chain1.pem <- cafile  
-fullchain1.pem <- I suspect not used, but.. it might be the cafile?
+fullchain1.pem <- I suspect not used, but.. it might be the cafile?  
 privkey1.pem <- keyfile  
 
 Review the Certs
@@ -82,6 +95,6 @@ for FILE in `ls *2.pem`; do echo "## $FILE"; openssl x509 -in $FILE -noout -text
 ## References
 https://medium.com/@karansingh010/lets-automate-let-s-encrypt-tls-certs-for-openshift-4-211d6c081875  
 
-Don't use this one - but, it's good to review: 
+Don't *acutally* use this one - but, it's good to review:  
 https://docs.openshift.com/container-platform/4.5/security/certificates/replacing-default-ingress-certificate.html
 
