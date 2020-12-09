@@ -79,7 +79,7 @@ I had attempted to do all this by manually creating my certs, etc... thankfully 
 * --cert=/root/OCP4/Certs/cert1.pem  
 * --key=/root/OCP4/Certs/privkey1.pem  
 
-You will get 4 files from LetsEncrypt in /etc/letsencrypt/archive i 
+You will get 4 files from LetsEncrypt in /etc/letsencrypt/archive 
 
 cert1.pem <- certfile  
 chain1.pem <- cafile  

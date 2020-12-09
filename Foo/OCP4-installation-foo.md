@@ -11,10 +11,10 @@ NOTE:  you don't *always* need to do this part.  It is here (mostly) as a refere
 FILES="openshift-install-linux.tar.gz openshift-client-linux.tar.gz"
 for FILE in $FILES
 do 
-  mv $FILE $FILE-`date +%F`
+  [ -f $FILE ] && mv $FILE $FILE-`date +%F`
 done
 
-case OS in 
+case `uname` in 
   Linux)
     wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux.tar.gz
     wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
@@ -28,17 +28,7 @@ esac
 for FILE in openshift-install-*.tar.gz openshift-client-*.tar.gz; do tar -xvzf $FILE; done
 ```
 
-## Typical OCP4 Install
-### Set ENVIRONMENT VARS
-```
-THEDATE=`date +%F-%H%M`
-CLUSTER_NAME=ocp4-mwn
-BASE_DOMAIN=linuxrevolution.com
-OCP4DIR=${HOME}/OCP4/${CLUSTER_NAME}.${BASE_DOMAIN}-${THEDATE}
-VC_HOSTNAME=vmw-vcenter6.matrix.lab
-```
-
-## Install the certs from VMware vCenter
+### VMware | Install the certs from VMware vCenter
 You likely won't need to do this, it's just for reference.
 ```
 CERT_BUNDLE=${VC_HOSTNAME}-${THEDATE}.zip
@@ -48,12 +38,20 @@ cp  $OCP4DIR/certs/lin/*.0 /etc/pki/ca-trust/source/anchors/
 update-ca-trust extract
 ```
 
-## Getting Started
+## Getting Started | Typical OCP4 Install
+### Set ENVIRONMENT VARS
 ```
 cd ${HOME}/OCP4/
 tmux new -s OCP4install || tmux attach -t OCP4install
-# NOTE:  after attaching to TMUX, make sure you reset the VARS (above ^^)
 
+THEDATE=`date +%F-%H%M`
+CLUSTER_NAME=ocp4-mwn
+BASE_DOMAIN=linuxrevolution.com
+OCP4DIR=${HOME}/OCP4/${CLUSTER_NAME}.${BASE_DOMAIN}-${THEDATE}
+VC_HOSTNAME=vmw-vcenter6.matrix.lab
+```
+
+```
 nslookup api.${CLUSTER_NAME}.${BASE_DOMAIN}
 nslookup *.apps.${CLUSTER_NAME}.${BASE_DOMAIN}
 
@@ -66,8 +64,9 @@ sed -i -e '/^10.10/d' ~/.ssh/known_hosts
 #./openshift-install create install-config --dir=${OCP4DIR}/ --log-level=info
 # Using the previously created install config....
 cp install-config-vsphere-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml $OCP4DIR/install-config.yaml
+vi $_
 ./openshift-install create cluster --dir=${OCP4DIR}/ --log-level=debug
-#export KUBECONFIG=${OCP4DIR}/auth/kubeconfig
+export KUBECONFIG=${OCP4DIR}/auth/kubeconfig
 ```
 
 If you'd like to create an install configuration, or already have an existing install configuration:
@@ -105,7 +104,6 @@ journalctl -f -u dhcpd
 Dec 02 12:11:19 rh7-sat6-srv01.matrix.lab dhcpd[9566]: DHCPREQUEST for 10.10.10.199 from 00:50:56:a5:40:2e (ocp4-mwn-kkdz5-worker-rnphr) via ens192
 ```
 
-
 ## OCP4 on RHV (RHHI-V)
 Status:  Untested.  I do not have an environment to test this with yet.
 
@@ -140,11 +138,11 @@ I have a bit of an intersting situation - my HomeLab has it's own DNS (matrix.la
 ? Pull Secret [? for help]
 ```
 
-oc login -u kubeadmin -p `cat $(find $OCP4DIR/*mwn* -name kubeadmin-password)`  https://api.ocp4-mwn.linuxrevolution.com:6443/
 
 ## Login to the Environment
 
 ```
+oc login -u kubeadmin -p `cat $(find $OCP4DIR/ -name kubeadmin-password)`  https://api.ocp4-mwn.linuxrevolution.com:6443/
 export KUBECONFIG=/root/OCP4/${OCP4DIR}/auth/kubeconfig
 oc get nodes
 ```
@@ -235,13 +233,11 @@ Then scale-down and scale-up
 ```
 MACHINESET=$(oc get machineset -n openshift-machine-api | grep -v ^NAME | awk '{ print $1 }')
 oc scale --replicas=0 machineset $MACHINESET  -n openshift-machine-api
-
-
+```
 
 ## Customize the OpenShift Console logo
 
 ```
-wget https://github.com/cloudxabide/matrix.lab/raw/master/images/LinuxRevolution_RedGradient.png -O ${OCP4DIR}/LinuxRevolution_RedGradient.png
 wget https://github.com/cloudxabide/matrix.lab/raw/main/images/LinuxRevolution_RedGradient.png -O ${OCP4DIR}/LinuxRevolution_RedGradient.png
 
 oc create configmap console-custom-logo --from-file ${OCP4DIR}/LinuxRevolution_RedGradient.png  -n openshift-config

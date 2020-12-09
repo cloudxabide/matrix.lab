@@ -93,12 +93,14 @@ Our heroes will function as hypervisors or compute nodes.
 
 ## Network Services (infrastructure)
 
-| Service        | Purpose                           | Host(s)                                      |
-|:---------------|:----------------------------------|:---------------------------------------------|
-| NTP            | Network Time Protocol             | 10.10.10.10 <BR> 10.10.10.17 <BR> 10.10.10.19
-| DNS            | Domain Name Service               | 10.10.10.121 <BR> 10.10.10.122
-| Auth           | Authentication <BR> Authorization | 10.10.10.121 <BR> 10.10.10.122
-| PXE, TFTP, WWW | Kickstart for network             | 10.10.10.10 (*)
+| Service        | Purpose                           | Host(s)                                       |
+|:---------------|:----------------------------------|:----------------------------------------------|
+| NTP            | Network Time Protocol             | 10.10.10.10 <BR> 10.10.10.17 <BR> 10.10.10.19 |
+| DNS            | Domain Name Service               | 10.10.10.121 <BR> 10.10.10.122                |
+| Auth           | Authentication <BR> Authorization | 10.10.10.121 <BR> 10.10.10.122                |
+| PXE, TFTP, WWW | Kickstart for network             | 10.10.10.10 (*)                               |
+| DHCP	         | IP addresses for Guests           | 10.10.10.192-248                              |
+
 
 * otherwise: 10.10.10.102 if Satellite is configured to provide Provisioning
 
