@@ -1,0 +1,59 @@
+apiVersion: v1
+baseDomain: clouditoutloud.com 
+credentialsMode: Mint 
+controlPlane:   
+  hyperthreading: Enabled 
+  name: master
+  platform:
+    aws:
+      zones:
+      - us-gov-west-1a
+      - us-gov-west-1b
+      rootVolume:
+        iops: 4000
+        size: 500
+        type: io1 
+      type: m5.xlarge
+  replicas: 3
+compute: 
+- hyperthreading: Enabled 
+  name: worker
+  platform:
+    aws:
+      rootVolume:
+        iops: 2000
+        size: 500
+        type: io1 
+      type: c5.4xlarge
+      zones:
+      - us-gov-west-1c
+  replicas: 3
+metadata:
+  name: test-cluster 
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 10.0.0.0/16
+  networkType: OpenShiftSDN
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  aws:
+    region: us-gov-west-1
+    userTags:
+      adminContact: jdoe
+      costCenter: 7536
+    subnets: 
+    - subnet-1
+    - subnet-2
+    - subnet-3
+    amiID: ami-96c6f8f7 
+    serviceEndpoints: 
+      - name: ec2
+        url: https://vpce-id.ec2.us-west-2.vpce.amazonaws.com
+pullSecret: '{"auths": ...}' 
+fips: false 
+sshKey: ssh-ed25519 AAAA... 
+publish: Internal 
