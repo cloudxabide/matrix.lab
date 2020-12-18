@@ -14,6 +14,7 @@ My environment is a home lab which has a single ingress/egress point and a singl
 I'm not going to provide details on how to install RHEL, nor LetsEncrypt - mostly because there are *plenty* of docs out there, and the moment I run "git push" my docs will probably be out of date.  
 
 Create your top-level domain (TLD) in AWS Route53 (and ONLY your TLD).  This actually took me a bit to figure out, as it is NOT intuitive.  You start with your TLD with no reference to OCP.  Then create your certs (which creates a bunch of entries (TXT records) and then removes them.  Once complete, you will need to then create your 2 x A records (api.<cluster_name>.<domain> and *.apps.<cluster_name>.<domain>).  NOTE:  You *can* create subdomains from your TLD, but it's a bit of a PITA (and not worth it, IMO, since we only need 2 static IP entries).
+
 ## Pre-reqs
 ```
 export CERTDIR=$HOME/certificates
@@ -49,7 +50,7 @@ issue_new_cert() {
 ${HOME}/acme.sh/acme.sh --install-cert -d ${LE_API} -d *.${LE_WILDCARD} -d *.${LE_TLD} --cert-file ${CERTDIR}/cert.pem --key-file ${CERTDIR}/key.pem --fullchain-file ${CERTDIR}/fullchain.pem --ca-file ${CERTDIR}/ca.cer
 ```
 
-## OpenShift Commands
+## Update OpenShift 
 This section details what is needed on the OCP side 
 ```
 for FILE in fullchain.pem key.pem
@@ -68,9 +69,8 @@ oc patch apiserver cluster --type=merge --patch='{"spec": { "servingCerts": {"na
 # oc delete # secret # lts # router-certs -n # openshift-ingress
 ```
 
-###
+### Public Doc on how to use Lets Encrypt in an automated fashion
 https://medium.com/@karansingh010/lets-automate-let-s-encrypt-tls-certs-for-openshift-4-211d6c081875
-
 
 ## Notes 
 I had attempted to do all this by manually creating my certs, etc... thankfully the "automated" process (above) works instead ;-)  

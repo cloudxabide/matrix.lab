@@ -39,11 +39,13 @@ update-ca-trust extract
 ```
 
 ## Getting Started | Typical OCP4 Install
-### Set ENVIRONMENT VARS
+### Start your TMUX Session
 ```
 cd ${HOME}/OCP4/
 tmux new -s OCP4install || tmux attach -t OCP4install
 
+### Set ENVIRONMENT VARS
+```
 THEDATE=`date +%F-%H%M`
 CLUSTER_NAME=ocp4-mwn
 BASE_DOMAIN=linuxrevolution.com
@@ -143,7 +145,7 @@ I have a bit of an intersting situation - my HomeLab has it's own DNS (matrix.la
 
 ```
 oc login -u kubeadmin -p `cat $(find $OCP4DIR/ -name kubeadmin-password)`  https://api.ocp4-mwn.linuxrevolution.com:6443/
-export KUBECONFIG=/root/OCP4/${OCP4DIR}/auth/kubeconfig
+# export KUBECONFIG=/root/OCP4/${OCP4DIR}/auth/kubeconfig
 oc get nodes
 ```
 
@@ -152,7 +154,9 @@ For *my* enviromment, NFS was the ideal target for the registry as it provides R
 NOTE: it is assumed that OCP has been successfully installed by this time.
 Also - I had to do some nonsense to make my freeNAS work for this (and it's likely NOT ideal)
 
+
 ### Create the yaml definition for the registry PV and PVC
+#### NOTE: go remove seraph:/mnt/raidZ/nfs-registry/docker
 ```
 mkdir ${OCP4DIR}/Registry; cd $_
 cat << EOF > image-registry-pv.yaml
@@ -232,7 +236,8 @@ oc edit machineset -n openshift-machine-api
 Then scale-down and scale-up
 ```
 MACHINESET=$(oc get machineset -n openshift-machine-api | grep -v ^NAME | awk '{ print $1 }')
-oc scale --replicas=0 machineset $MACHINESET  -n openshift-machine-api
+oc scale --replicas=6 machineset $MACHINESET  -n openshift-machine-api
+oc scale --replicas=3 machineset $MACHINESET  -n openshift-machine-api
 ```
 
 ## Customize the OpenShift Console logo
@@ -243,6 +248,8 @@ wget https://github.com/cloudxabide/matrix.lab/raw/main/images/LinuxRevolution_R
 oc create configmap console-custom-logo --from-file ${OCP4DIR}/LinuxRevolution_RedGradient.png  -n openshift-config
 oc edit console.operator.openshift.io cluster
 # Update spec: customization: customLogoFile: {key,name}:
+## add after "operatorLogLevel: Normal"
+  operatorLogLevel: Normal
   customization:
     customLogoFile:
       key: LinuxRevolution_RedGradient.png
@@ -259,6 +266,7 @@ HTPASSWD_FILE=${OCP4DIR}/htpasswd
 
 htpasswd -b -c $HTPASSWD_FILE morpheus $PASSWORD
 htpasswd -b $HTPASSWD_FILE ocpguest $PASSWORD
+htpasswd -b $HTPASSWD_FILE ocpadmin $PASSWORD
 
 oc create secret generic htpass-secret --from-file=htpasswd=${HTPASSWD_FILE} -n openshift-config
 cat << EOF > ${OCP4DIR}/HTPasswd-CR
@@ -277,6 +285,8 @@ spec:
 EOF
 
 oc apply -f ${OCP4DIR}/HTPasswd-CR
+# You need to login to the cluster with 'ocpadmin' user
+oc adm policy add-cluster-role-to-user cluster-admin ocpadmin
 ```
 
 ## Add Legit Certs
