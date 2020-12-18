@@ -4,4 +4,4 @@
 
 
 ## Overview
-[MatrixLab OCP4 Overview](MatrixLab-OCP4-Overivew.png)
+[MatrixLab OCP4 Overview](images/MatrixLab-OCP4-Overivew.png)
