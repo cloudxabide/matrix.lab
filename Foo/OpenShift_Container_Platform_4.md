@@ -1,5 +1,9 @@
 # OpenShift Container Platform 4
 
+
+## Overview (topology)
+![MatrixLab OCP4 Overview](../images/MatrixLab-OCP4-Overivew.png)
+
 ## "Hardware Requirements"
 
 ### OCP and OCS Cluster
@@ -29,6 +33,9 @@ From the Install Docs
 nslookup api.ocp4-mwn.matrix.la
 nslookup test.apps.ocp4-mwn.matrix.lab
 ```
+
+## Steady State
+![Cluster Steady State](../images/Cluster_Steady_State.png)
 
 ## References
 [Installing Bare Metal](https://docs.openshift.com/container-platform/4.5/installing/installing_bare_metal/installing-bare-metal.html#minimum-resource-requirements_installing-bare-metal) I struggled to find min requirememnts - this was the only place I found find any "hardware requirements"
