@@ -35,6 +35,7 @@ nslookup test.apps.ocp4-mwn.matrix.lab
 ```
 
 ## Steady State
+NOTE:  I had updated the machineset for the compute nodes before grabbing this output (normally they would only have 8GB memory)
 ![Cluster Steady State](../images/Cluster_Steady_State.png)
 
 ## References
