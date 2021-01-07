@@ -8,11 +8,20 @@
 
 ### OCP and OCS Cluster
 | Machine       | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage 
-|:--------------|:------------------|:----:|:------------|:--------|:-----------|:-:|-----|:----|:-------
+|:--------------|:------------------|:----:|:------------|:--------|:-----------|:-:|------|:----|:-------
 | Bootstrap     | RHCOS             | 4    | 16 GB       | 120 GB  | 1          | - | 4    | 16  | 120
 | Control plane | RHCOS             | 4    | 16 GB       | 120 GB  | 3          | - | 12   | 48  | 360
 | Compute       | RHCOS or RHEL 7.6 | 2    | 8 GB        | 120 GB  | 3          | - | 6    | 24  | 360
 |               |                   |      |             |         | **totals** | = | 22   | 88  | 840
+
+| Machine       | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage
+|:--------------|:------------------|:----:|:------------|:--------|:-----------|:-:|-----|:-----|:-------
+| Infra Nodes   | RHCOS             | 4    | 16 GB       | 120 GB  | 3          | - | 12   | 48  | 360
+| Storage Nodes | RHCOS             | 4    | 16 GB       | 120 GB  | 3          | - | 12   | 48  | 360 (*)
+|               |                   |      |             |         | **totals** | = | 24   | 96  | 720
+(*)  This will depend on projected storage usage.  Keep in mind that OCS uses CEPH in 3x replication.  Meaning
+storage required is N * 3, where is N is the usable storage.  CEPH *does* use COW which can optimally utilize the 
+storage.
 
 ### ACM Cluster
 | Machine       | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage 
