@@ -4,25 +4,40 @@
 ## Overview (topology)
 ![MatrixLab OCP4 Overview](../images/MatrixLab-OCP4-Overivew.png)
 
-## "Hardware Requirements"
+## "Infrastructure Requirements"
 
 ### OCP and OCS Cluster
-| Machine          | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage  |
-|:-----------------|:------------------|:----:|:------------|:--------|:-----------|:-:|------|:----|:------- |
-| Bootstrap        | RHCOS             | 4    | 16 GB       | 120 GB  | 1          | - | 4    | 16  | 120 |
-| Control plane    | RHCOS             | 4    | 16 GB       | 120 GB  | 3          | - | 12   | 48  | 360 |
-| Compute (worker) | RHCOS or RHEL 7.x | 2    | 8 GB        | 120 GB  | 3          | - | 6    | 24  | 360 |
-|                  |                   |      |             |         | **totals** | = | 22   | 88  | 840 |
- 
+#### Phase (initial)
+| Machine           | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage |
+|:------------------|:------------------|:----:|:------------|:--------|:-----------|:-:|------|:----|:------- |
+| Bootstrap         | RHCOS             | 4    | 16 GB       | 120 GB  | 1          | - | 4    | 16  | 120     |
+| Control plane     | RHCOS             | 4    | 16 GB       | 120 GB  | 3          | - | 12   | 48  | 360     |
+| Compute (worker)  | RHCOS or RHEL 7.x | 2    | 8 GB        | 120 GB  | 3          | - | 6    | 24  | 360     |
+|                   |                   |      |             |         | **totals** | = | 22   | 88  | 840     |
+
+#### Phase (Day 2)
 | Machine           | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage |
 |:------------------|:------------------|:----:|:------------|:--------|:-----------|:-:|-----|:-----|:------- |
-| Compute (Infra)   | RHCOS             | 4    | 16 GB       | 120 GB  | 3          | - | 12   | 48  | 360 |
-| Compute (Storage) | RHCOS             | 4    | 16 GB       | 120 GB  | 3          | - | 12   | 48  | 360 (*) |
-|                   |                   |      |             |         | **totals** | = | 24   | 96  | 720 |
+| Compute (Infra)   | RHCOS             | 4    | 16 GB       | 120 GB  | 3          | - | 12   | 48  | 360     |
+| Compute (Storage) | RHCOS             | 8    | 24 GB       | 120 GB  | 3          | - | 24   | 72  | 360 (*) |
+|                   |                   |      |             |         | **totals** | = | 36   | 120 | 720     |
 
-(*)  This will depend on projected storage usage.  Keep in mind that OCS uses CEPH in 3x replication.  Meaning
+-- 
+
+#### Total Cluster Allocation 
+|  Phase            | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage |
+|:------------------|:------------------|:----:|:------------|:--------|:-----------|:-:|-----|:-----|:------- |
+| Initial           |                   |      |             |         |            | = | 22   | 88  | 840     |
+| Day 2             |                   |      |             |         |            | = | 36   | 120 | 720     |
+|                   |                   |      |             |         | **totals** | = | 58   | 208 | 1560    |
+
+
+
+(*)  This will depend on projected storage usage.  Keep in mind that OCS uses CEPH with 3x replication.  Meaning
 storage required is N * 3, where is N is the usable storage.  CEPH *does* use COW which can optimally utilize the 
-storage.
+storage.  
+(Infra) - EFK stack  
+(Storage) - OCS
 
 ### ACM Cluster
 | Machine       | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage 
@@ -52,4 +67,8 @@ NOTE:  I had updated the machineset for the compute nodes before grabbing this o
 [Installing Bare Metal](https://docs.openshift.com/container-platform/4.5/installing/installing_bare_metal/installing-bare-metal.html#minimum-resource-requirements_installing-bare-metal) I struggled to find min requirememnts - this was the only place I found find any "hardware requirements"
 
 [Installing vSphere Installer Provisioned - Cluster Resources](https://docs.openshift.com/container-platform/4.5/installing/installing_vsphere/installing-vsphere-installer-provisioned.html) Overview of "hardware requirements" as a total
+
+[OCS Sizing Tool](https://sizer.ocs.ninja/)
+
+[OCS - Infrastructure Requirements - Capacity Planning](https://access.redhat.com/documentation/en-us/red_hat_openshift_container_storage/4.6/html/planning_your_deployment/infrastructure-requirements_rhocs#capacity_planning)
 
