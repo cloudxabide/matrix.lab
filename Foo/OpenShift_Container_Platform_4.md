@@ -8,7 +8,7 @@
 
 ### OCP and OCS Cluster
 #### Phase (initial)
-| Machine           | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage |
+| Node              | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage |
 |:------------------|:------------------|:----:|:------------|:--------|:-----------|:-:|------|:----|:------- |
 | Bootstrap         | RHCOS             | 4    | 16 GB       | 120 GB  | 1          | - | 4    | 16  | 120     |
 | Control plane     | RHCOS             | 4    | 16 GB       | 120 GB  | 3          | - | 12   | 48  | 360     |
@@ -16,13 +16,11 @@
 |                   |                   |      |             |         | **totals** | = | 22   | 88  | 840     |
 
 #### Phase (Day 2)
-| Machine           | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage |
+| Node              | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage |
 |:------------------|:------------------|:----:|:------------|:--------|:-----------|:-:|-----|:-----|:------- |
 | Compute (Infra)   | RHCOS             | 4    | 16 GB       | 120 GB  | 3          | - | 12   | 48  | 360     |
 | Compute (Storage) | RHCOS             | 8    | 24 GB       | 120 GB  | 3          | - | 24   | 72  | 360 (*) |
 |                   |                   |      |             |         | **totals** | = | 36   | 120 | 720     |
-
--- 
 
 #### Total Cluster Allocation 
 |  Phase            | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage |
@@ -30,8 +28,6 @@
 | Initial           |                   |      |             |         |            | = | 22   | 88  | 840     |
 | Day 2             |                   |      |             |         |            | = | 36   | 120 | 720     |
 |                   |                   |      |             |         | **totals** | = | 58   | 208 | 1560    |
-
-
 
 (*)  This will depend on projected storage usage.  Keep in mind that OCS uses CEPH with 3x replication.  Meaning
 storage required is N * 3, where is N is the usable storage.  CEPH *does* use COW which can optimally utilize the 
@@ -55,9 +51,13 @@ From the Install Docs
 
 ### DNS Entries
 ```
-nslookup api.ocp4-mwn.matrix.la
-nslookup test.apps.ocp4-mwn.matrix.lab
+nslookup api.ocp4-mwn.matrix.lab         # for the API to the control-plane
+nslookup test.apps.ocp4-mwn.matrix.lab   # for the OCP "apps" such as grafana and the console
+nslookup test.proles.ocp4-mwn.matrix.lab # for the F5 ingress for hosted apps
 ```
+
+[Wikipedia - Proles](https://en.wikipedia.org/wiki/Proles_(Nineteen_Eighty-Four)) - "the proles are the working class of Oceania."  
+I'll mix a little Orwell in with my Matrix theme.  
 
 ## Steady State
 NOTE:  I had updated the machineset for the compute nodes before grabbing this output (normally they would only have 8GB memory)

@@ -198,7 +198,8 @@ ipa dnsrecord-add matrix.lab rh7-sat6-srv02     --a-rec 10.10.10.106
 ipa dnsrecord-add matrix.lab rh7-ans-srv01      --a-rec 10.10.10.107
 ipa dnsrecord-add matrix.lab rh7-lms-srv01      --a-rec 10.10.10.110
 ipa dnsrecord-add matrix.lab librenms           --cname-rec='rh7-lms-srv01'
-ipa dnsrecord-add matrix.lab rh7-jenkins-srv01  --a-rec 10.10.10.111
+ipa dnsrecord-add matrix.lab rh7-jenkins-srv01 --a-rec 10.10.10.111
+ipa dnsrecord-add matrix.lab f5-bigip-001      --a-rec 10.10.10.112
 ipa dnsrecord-add matrix.lab jenkins            --cname-rec='rh7-jenkins-srv01'
 ipa dnsrecord-add matrix.lab vmw-vcenter6       --a-rec 10.10.10.130
 ipa dnsrecord-add matrix.lab win-2019-srv01      --a-rec 10.10.10.131
@@ -212,6 +213,8 @@ ipa dnsrecord-add 10.10.10.in-addr.arpa 106     --ptr-rec rh7-sat6-srv02.matrix.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 107     --ptr-rec rh7-ans-srv01.matrix.lab.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 110     --ptr-rec rh7-lms-srv01.matrix.lab.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 111     --ptr-rec rh7-jenkins-srv01.matrix.lab.
+ipa dnsrecord-add 10.10.10.in-addr.arpa 112     --ptr-rec f5-bigip-01.matrix.lab.
+
 ipa dnsrecord-add 10.10.10.in-addr.arpa 130     --ptr-rec vmw-vcenter6.matrix.lab.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 131     --ptr-rec win-2019-srv01.matrix.lab.
 ###############
@@ -242,27 +245,32 @@ done
 ocp4() {
 #ipa dnszone-add ocp4-mwn.matrix.lab      --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
 #ipa dnszone-add apps.ocp4-mwn.matrix.lab --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
+#ipa dnszone-add proles.ocp4-mwn.matrix.lab --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
 #ipa dnsrecord-add   ocp4-mwn.matrix.lab         'api'     --a-rec 10.10.10.161
 #ipa dnsrecord-add   apps.ocp4-mwn.matrix.lab    '*'       --a-rec 10.10.10.162
+ipa dnsrecord-add   proles.ocp4-mwn.matrix.lab    '*'       --a-rec 10.10.10.162
 #ipa dnsrecord-add   10.10.10.in-addr.arpa       161       --ptr-rec api.ocp4-mwn.matrix.lab.
 #ipa dnsrecord-add   10.10.10.in-addr.arpa       162       --ptr-rec *.apps.ocp4-mwn.matrix.lab.
 
 ipa dnszone-add linuxrevolution.com      --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
 ipa dnszone-add ocp4-mwn.linuxrevolution.com      --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
 ipa dnszone-add apps.ocp4-mwn.linuxrevolution.com --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
+ipa dnszone-add proles.ocp4-mwn.linuxrevolution.com --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
 ipa dnsrecord-add   linuxrevolution.com                  '*'       --a-rec   10.10.10.162
 ipa dnsrecord-add   ocp4-mwn.linuxrevolution.com         'api'     --a-rec   10.10.10.161
 ipa dnsrecord-add   apps.ocp4-mwn.linuxrevolution.com    '*'       --a-rec   10.10.10.162
+ipa dnsrecord-add   proles.ocp4-mwn.linuxrevolution.com  '*'       --a-rec   10.10.10.163
 ipa dnsrecord-add   10.10.10.in-addr.arpa                161       --ptr-rec api.ocp4-mwn.linuxrevolution.com
 ipa dnsrecord-add   10.10.10.in-addr.arpa                162       --ptr-rec *.apps.ocp4-mwn.linuxrevolution.com
+ipa dnsrecord-add   10.10.10.in-addr.arpa                163       --ptr-rec *.proles.ocp4-mwn.linuxrevolution.com
 
-ipa dnszone-add linuxrevolution.com      --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
-ipa dnszone-add ocp4-acm.linuxrevolution.com      --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
-ipa dnszone-add apps.ocp4-acm.linuxrevolution.com --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
-ipa dnsrecord-add   ocp4-acm.linuxrevolution.com         'api'     --a-rec   10.10.10.171
-ipa dnsrecord-add   apps.ocp4-acm.linuxrevolution.com    '*'       --a-rec   10.10.10.172
-ipa dnsrecord-add   10.10.10.in-addr.arpa                171       --ptr-rec api.ocp4-acm.linuxrevolution.com
-ipa dnsrecord-add   10.10.10.in-addr.arpa                172       --ptr-rec *.apps.ocp4-acm.linuxrevolution.com
+ipa dnszone-add    linuxrevolution.com               --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
+ipa dnszone-add    ocp4-acm.linuxrevolution.com      --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
+ipa dnszone-add    apps.ocp4-acm.linuxrevolution.com --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
+ipa dnsrecord-add  ocp4-acm.linuxrevolution.com      'api'     --a-rec   10.10.10.171
+ipa dnsrecord-add  apps.ocp4-acm.linuxrevolution.com '*'       --a-rec   10.10.10.172
+ipa dnsrecord-add  10.10.10.in-addr.arpa              171      --ptr-rec api.ocp4-acm.linuxrevolution.com
+ipa dnsrecord-add  10.10.10.in-addr.arpa              172      --ptr-rec *.apps.ocp4-acm.linuxrevolution.com
 }
 
 ipa dnszone-add    jetson.lab --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
@@ -276,6 +284,7 @@ ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1' jetson
 ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1' linuxrevolution.com
 ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1' ocp4-mwn.linuxrevolution.com
 ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1' apps.ocp4-mwn.linuxrevolution.com
+ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1' proles.ocp4-mwn.linuxrevolution.com
 ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1' ocp4-acm.linuxrevolution.com
 ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1' apps.ocp4-acm.linuxrevolution.com
 ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1' 10.10.10.in-addr.arpa

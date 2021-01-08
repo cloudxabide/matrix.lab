@@ -43,6 +43,7 @@ update-ca-trust extract
 ```
 cd ${HOME}/OCP4/
 tmux new -s OCP4install || tmux attach -t OCP4install
+```
 
 ### Set ENVIRONMENT VARS
 ```
