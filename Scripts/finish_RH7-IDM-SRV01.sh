@@ -196,6 +196,7 @@ ipa dnsrecord-add matrix.lab rh7-rhv4-mgr01     --a-rec 10.10.10.104
 ipa dnsrecord-add matrix.lab rh7-cfme-srv01     --a-rec 10.10.10.105
 ipa dnsrecord-add matrix.lab rh7-sat6-srv02     --a-rec 10.10.10.106
 ipa dnsrecord-add matrix.lab rh7-ans-srv01      --a-rec 10.10.10.107
+ipa dnsrecord-add matrix.lab rh7-ocp4-bst01      --a-rec 10.10.10.108
 ipa dnsrecord-add matrix.lab rh7-lms-srv01      --a-rec 10.10.10.110
 ipa dnsrecord-add matrix.lab librenms           --cname-rec='rh7-lms-srv01'
 ipa dnsrecord-add matrix.lab rh7-jenkins-srv01 --a-rec 10.10.10.111
@@ -211,6 +212,7 @@ ipa dnsrecord-add 10.10.10.in-addr.arpa 104     --ptr-rec rh7-rhv4-mgr01.matrix.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 105     --ptr-rec rh7-cfme-srv01.matrix.lab.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 106     --ptr-rec rh7-sat6-srv02.matrix.lab.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 107     --ptr-rec rh7-ans-srv01.matrix.lab.
+ipa dnsrecord-add 10.10.10.in-addr.arpa 108     --ptr-rec rh7-ocp4-bst01.matrix.lab.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 110     --ptr-rec rh7-lms-srv01.matrix.lab.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 111     --ptr-rec rh7-jenkins-srv01.matrix.lab.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 112     --ptr-rec f5-bigip-01.matrix.lab.

@@ -1,76 +1,143 @@
-# OCP4 Installation Foo
-STATUS:  Work in Progress.  Trying to make this less dependent on the host it's running on and PULL 
+# OCP4 Installation (VMware/IPI)
+
+STATUS:  Work in Progress.  Trying to make this less dependent on the host it's running on and PULL
            everything needed for all the tasks.
 
-## Pre-reqs 
+NOTES:  I have been running this installation as root - but, that is not necessary (other than the certificate stuff)
+
+
+## Pre-reqs
 NOTE:  you don't *always* need to do this part.  It is here (mostly) as a reference.
- 
+
 ### Download the Installer and Client
 ```
 # TODO: instead of doing an rm, figure out how to rename it based on the version or something
 FILES="openshift-install-linux.tar.gz openshift-client-linux.tar.gz"
 for FILE in $FILES
-do 
+do
   [ -f $FILE ] && mv $FILE $FILE-`date +%F`
 done
 
-case `uname` in 
+case `uname` in
   Linux)
     wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux.tar.gz
     wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
   ;;
-  Darwin) 
+  Darwin)
     curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-mac.tar.gz -o openshift-install-mac.tar.gz
-    curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-mac.tar.gz -o openshift-client-mac.tar.gz  
+    curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-mac.tar.gz -o openshift-client-mac.tar.gz
   ;;
-esac 
+esac
 
 for FILE in openshift-install-*.tar.gz openshift-client-*.tar.gz; do tar -xvzf $FILE; done
 ```
 
-### VMware | Install the certs from VMware vCenter
-You likely won't need to do this, it's just for reference.
-```
-CERT_BUNDLE=${VC_HOSTNAME}-${THEDATE}.zip
-curl -k https://${VC_HOSTNAME}/certs/download.zip -o ${CERT_BUNDLE}
-unzip ${CERT_BUNDLE} -d $OCP4DIR/
-cp  $OCP4DIR/certs/lin/*.0 /etc/pki/ca-trust/source/anchors/
-update-ca-trust extract
-```
-
 ## Getting Started | Typical OCP4 Install
+You should start your TMUX and *then* set your ENV vars
+
 ### Start your TMUX Session
 ```
+SHORTDATE=`date +%F`
+which tmux || yum -y install tmux
 cd ${HOME}/OCP4/
-tmux new -s OCP4install || tmux attach -t OCP4install
+tmux new -s OCP4-${SHORTDATE}|| tmux attach -t OCP4-${SHORTDATE}
 ```
 
 ### Set ENVIRONMENT VARS
 ```
-THEDATE=`date +%F-%H%M`
 CLUSTER_NAME=ocp4-mwn
 BASE_DOMAIN=linuxrevolution.com
-OCP4DIR=${HOME}/OCP4/${CLUSTER_NAME}.${BASE_DOMAIN}-${THEDATE}
-VC_HOSTNAME=vmw-vcenter6.matrix.lab
+HYPERVISOR=vsphere
+
+SHORTDATE=`date +%F`
+THEDATE=`date +%F-%H%M`
+OCP4_BASE=${HOME}/OCP4/
+OCP4DIR=${OCP4_BASE}/${CLUSTER_NAME}.${BASE_DOMAIN}-${THEDATE}
+INSTALLER_DIR="installer-${SHORTDATE}"
+SSH_KEY_FILE="${HOME}/.ssh/id_rsa-${BASE_DOMAIN}.pub"
+SSH_KEY=$(cat $SSH_KEY_FILE)
+PULL_SECRET_FILE=${OCP4_BASE}/pull-secret.txt
+PULL_SECRET=$(cat $PULL_SECRET_FILE)
+export BASE_DOMAIN BRIDGE_NAME SSH_KEY PULL_SECRET CLUSTER_NAME
+
+VC_HOSTNAME="vmw-vcenter6.matrix.lab"
+[ ! -d ${OCP4_BASE} ] && { mkdir ${OCP4_BASE}; cd $_; } || { cd ${OCP4_BASE}; }
+
+case $BASE_DOMAIN in 
+  linuxrevolution.com)
+    REPO_NAME=matrix.lab
+  ;;
+  *)
+    REPO_NAME=${BASE_DOMAIN}
+  ;;
+esac
 ```
 
+### VMware Certificates | Install the certs from VMware vCenter
+You likely won't need to do this, it's just for reference.
 ```
-nslookup api.${CLUSTER_NAME}.${BASE_DOMAIN}
-nslookup *.apps.${CLUSTER_NAME}.${BASE_DOMAIN}
+CERT_BUNDLE=${VC_HOSTNAME}-${SHORTDATE}.zip
+[ ! -f $CERT_BUNDLE ] && { 
+curl -k https://${VC_HOSTNAME}/certs/download.zip -o ${CERT_BUNDLE}; 
+unzip ${CERT_BUNDLE} -d $OCP4DIR/; 
+cp  $OCP4DIR/certs/lin/*.0 /etc/pki/ca-trust/source/anchors/; 
+update-ca-trust extract; 
+}
+```
 
+### SSH tweaks
+I create a separate SSH key just for this lab stuff (${HOME}/.ssh/id_rsa-${BASE_DOMAIN}
+```
+[ ! -f ${HOME}/.ssh/id_rsa-$BASE_DOMAIN ] && { echo | ssh-keygen -trsa -b2048 -N '' -f ${HOME}/.ssh/id_rsa-$BASE_DOMAIN; SSH_KEY=$(cat $SSH_KEY_FILE); }
+```
+
+## Build the Installer (If you need some custom install options... otherwise, use the standard installer)
+```
+git clone https://github.com/openshift/installer.git ${INSTALLER_DIR}
+cd ${INSTALLER_DIR}
+TAGS=libvirt hack/build.sh
+cd -
+```
+
+## Deploy (create) the cluster
+```
 eval "$(ssh-agent -s)"
-ssh-add /root/.ssh/id_rsa
-sed -i -e '/^10.10/d' ~/.ssh/known_hosts
-[ ! -d $OCP4DIR ] && { echo "NOTE: Making ${OCP4DIR}"; mkdir $OCP4DIR; } || echo "NOTE: $OCP4DIR already exists"
+ssh-add ${HOME}/.ssh/id_rsa-${BASE_DOMAIN}
+sed -i -e '/^192.168.126/d' ~/.ssh/known_hosts
+cd ${OCP4_BASE}
+[ ! -f install-config-${HYPERVISOR}-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml ] && { wget https://raw.githubusercontent.com/cloudxabide/${REPO_NAME}/main/Files/install-config-${HYPERVISOR}-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml; echo "You need to update the config file found in this directory"; }
+
+# Update the following values
+#   platform.libvirt.network.if << This is the bridge that will be created
+#   baseDomain  << the domain you plan to use
+#   compute.replicas << you *may* wish to add compute nodes?
+vi install-config-libvirt-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml
 
 # The following creates the "install-config" - copy it out of the directory
 #./openshift-install create install-config --dir=${OCP4DIR}/ --log-level=info
 # Using the previously created install config....
-cp install-config-vsphere-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml $OCP4DIR/install-config.yaml
-vi $_
-./openshift-install create cluster --dir=${OCP4DIR}/ --log-level=debug
+[ ! -d ${OCP4DIR}/ ] && mkdir ${OCP4DIR}/
+cat << EOF >
+install-config-libvirt-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml > $OCP4DIR/install-config.yaml
+${INSTALLER_DIR}/bin/openshift-install create cluster --dir=${OCP4DIR}/ --log-level=debug
+sudo virsh net-list
+ssh -i ~/.ssh/id_rsa-aperturelab core@192.168.126.10
+  journalctl -b -f -u release-image.service -u bootkube.service
+
+
 export KUBECONFIG=${OCP4DIR}/auth/kubeconfig
 ```
+
+
+
+
+
+
+
+
+
+
+
 
 If you'd like to create an install configuration, or already have an existing install configuration:
 ```
