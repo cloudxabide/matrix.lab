@@ -22,6 +22,10 @@
 | Compute (Storage) | RHCOS             | 8    | 24 GB       | 120 GB  | 3          | - | 24   | 72  | 360 (*) |
 |                   |                   |      |             |         | **totals** | = | 36   | 120 | 720     |
 
+(*)  This will depend on projected storage usage.  Keep in mind that OCS uses CEPH with 3x replication.  Meaning storage required is N * 3, where is N is the usable storage.  CEPH *does* use COW which can optimally utilize the storage.  
+(Infra) - EFK stack  
+(Storage) - OCS
+
 #### Total Cluster Allocation 
 |  Phase            | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage |
 |:------------------|:------------------|:----:|:------------|:--------|:-----------|:-:|-----|:-----|:------- |
@@ -29,11 +33,6 @@
 | Day 2             |                   |      |             |         |            | = | 36   | 120 | 720     |
 |                   |                   |      |             |         | **totals** | = | 58   | 208 | 1560    |
 
-(*)  This will depend on projected storage usage.  Keep in mind that OCS uses CEPH with 3x replication.  Meaning
-storage required is N * 3, where is N is the usable storage.  CEPH *does* use COW which can optimally utilize the 
-storage.  
-(Infra) - EFK stack  
-(Storage) - OCS
 
 ### ACM Cluster
 | Machine       | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage 
