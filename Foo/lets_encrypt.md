@@ -26,6 +26,7 @@ NOTE:  This is NOT my stuff (acme.sh) - use with caution
 Update your $HOME/.aws/credentials file with your Route53 enabled user
 
 ```
+AWS_USER=""
 cd $HOME
 git clone https://github.com/acmesh-official/acme.sh.git
 cd acme.sh
@@ -34,6 +35,12 @@ AWS_SECRET_ACCESS_KEY=$(grep -a2 $AWS_USER ~/.aws/credentials | grep aws_secret_
 export AWS_ACCESS_KEY_ID  AWS_SECRET_ACCESS_KEY
 echo $AWS_ACCESS_KEY_ID
 [ -z $AWS_SECRET_ACCESS_KEY ] && echo "hol'up - you did not set your AWSCLI vars yet"
+
+{
+LE_API=api.ocp4-mwn.linuxrevolution.com
+LE_TLD=linuxrevolution.com
+LE_WILDCARD=apps.ocp4-mwn.linuxrevolution.com
+}
 
 export LE_API=$(oc whoami --show-server | cut -f 2 -d ':' | cut -f 3 -d '/' | sed 's/-api././')
 export LE_WILDCARD=$(oc get ingresscontroller default -n openshift-ingress-operator -o jsonpath='{.status.domain}')
