@@ -36,3 +36,5 @@ platform:
     username: administrator@vsphere.matrix.lab
     vCenter: vmw-vcenter6.matrix.lab
 publish: External
+pullSecret: '$PULL_SECRET'
+sshKey: '$SSH_KEY'

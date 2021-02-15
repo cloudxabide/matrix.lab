@@ -53,7 +53,7 @@ platform:
     serviceEndpoints: 
       - name: ec2
         url: https://vpce-id.ec2.us-west-2.vpce.amazonaws.com
-pullSecret: '{"auths": ...}' 
 fips: false 
-sshKey: ssh-ed25519 AAAA... 
 publish: Internal 
+pullSecret: '$PULL_SECRET'
+sshKey: '$SSH_KEY'

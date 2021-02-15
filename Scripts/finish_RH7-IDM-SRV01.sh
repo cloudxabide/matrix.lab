@@ -281,7 +281,7 @@ ipa dnsrecord-add  jetson.lab     'elroy'   --a-rec   10.10.10.51
 ipa dnsrecord-add  10.10.10.in-addr.arpa       51   --ptr-rec elroy.jetson.lab.
 
 # THIS IS SPECIFIC TO MY HOME - it allows zone-transfer and "host -l matrix.lab" to run
-ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1' matrix.lab
+ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1,10.10.69.0/24' matrix.lab
 ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1' jetson.lab
 ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1' linuxrevolution.com
 ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1' ocp4-mwn.linuxrevolution.com

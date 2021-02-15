@@ -1,13 +1,17 @@
 # OCP4 Installation (VMware/IPI)
 
-STATUS:  Work in Progress.  Trying to make this less dependent on the host it's running on and PULL
+STATUS:  BROKEN :-(  I did some merge foo that really screwed up this file.
+         Previously: Work in Progress.  Trying to make this less dependent on the host it's running on and PULL
            everything needed for all the tasks.
 
-NOTES:  I have been running this installation as root - but, that is not necessary (other than the certificate stuff)
+NOTES:   I have been running this installation as root - but, that is not necessary (other than the certificate stuff)
 
+## Environment Details
 
-## Pre-reqs
-NOTE:  you don't *always* need to do this part.  It is here (mostly) as a reference.
+  OCP4_BASE=${HOME}/OCP4
+  INSTALLDIR=${OCP4_BASE}/
+
+I am struggling with a "chicken-before-egg" scenario with setting things up, but also integrating tmux in to this  mess
 
 ### Download the Installer and Client
 ```
@@ -37,10 +41,10 @@ You should start your TMUX and *then* set your ENV vars
 
 ### Start your TMUX Session
 ```
-SHORTDATE=`date +%F`
+INSTALLDATE=`date +%F`
 which tmux || yum -y install tmux
 cd ${HOME}/OCP4/
-tmux new -s OCP4-${SHORTDATE}|| tmux attach -t OCP4-${SHORTDATE}
+tmux new -s OCP4-${INSTALLDATE}|| tmux attach -t OCP4-${INSTALLDATE}
 ```
 
 ### Set ENVIRONMENT VARS
