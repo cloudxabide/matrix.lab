@@ -61,7 +61,7 @@ ipa dnsrecord-add 10.10.10.in-addr.arpa 123 --ptr-rec rh7-idm-srv03.matrix.lab.
   ;;
   rh7-idm-srv02)
     ipa-replica-install --principal admin --realm=MATRIX.LAB --domain=matrix.lab --setup-dns --no-forwarders --admin-password ${ADMINPASSWD}
-    echo $ADMINPASSWORD | ipa-ca-install
+    echo $ADMINPASSWD | ipa-ca-install
     # Or.. use the random password from above
     #ipa-replica-install --principal admin --realm=MATRIX.LAB --domain=matrix.lab --setup-dns --no-forwarders --password ${ADMINPASSWD}
   ;;
@@ -79,8 +79,8 @@ echo "$ADMINPASSWD" | kinit
 ###############
 # User/Group Management
 ###############
-echo "NotAPassword" | ipa user-add morpheus --uid=1000 --gidnumber=1000 --first=Morpheus --last=McChicken --email=morpheus@matrix.lab --homedir=/home/morpheus --shell=/bin/bash --password
-echo "NotAPassword" | ipa user-add jradtke --uid=2025 --gidnumber=2025 --first=James --last=Radtke --manager=Morpheus --email=jradtke@matrix.lab --homedir=/home/jradtke --shell=/bin/bash --password
+echo $ADMINPASSWD | ipa user-add morpheus --uid=1000 --gidnumber=1000 --first=Morpheus --last=McChicken --email=morpheus@matrix.lab --homedir=/home/morpheus --shell=/bin/bash --password
+echo $ADMINPASSWD | ipa user-add jradtke --uid=2025 --gidnumber=2025 --first=James --last=Radtke --manager=Morpheus --email=jradtke@matrix.lab --homedir=/home/jradtke --shell=/bin/bash --password
 ## NOTE: NEED TO PUT THESE IN TO "ipa" COMMANDS
 GROUPS="admins managers"
 for GROUP in $GROUPS
@@ -188,7 +188,6 @@ ipa dnsrecord-add 10.16.172.in-addr.arpa 19     --ptr-rec seraph-storage.matrix.
 ###############
 # Utility Hosts 
 ###############
-ipa dnsrecord-add matrix.lab websrv             --a-rec 10.10.10.20
 ipa dnsrecord-add matrix.lab rh8-util-srv01     --a-rec 10.10.10.100
 ipa dnsrecord-add matrix.lab rh7-sat6-srv01     --a-rec 10.10.10.102
 ipa dnsrecord-add matrix.lab rh7-sat6-cap01     --a-rec 10.10.10.103
@@ -204,7 +203,7 @@ ipa dnsrecord-add matrix.lab f5-bigip-001      --a-rec 10.10.10.112
 ipa dnsrecord-add matrix.lab jenkins            --cname-rec='rh7-jenkins-srv01'
 ipa dnsrecord-add matrix.lab vmw-vcenter6       --a-rec 10.10.10.130
 ipa dnsrecord-add matrix.lab win-2019-srv01      --a-rec 10.10.10.131
-ipa dnsrecord-add 10.10.10.in-addr.arpa 20      --ptr-rec websrv.matrix.lab.
+
 ipa dnsrecord-add 10.10.10.in-addr.arpa 100     --ptr-rec rh8-util-srv01.matrix.lab.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 102     --ptr-rec rh7-sat6-srv01.matrix.lab.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 103     --ptr-rec rh7-sat6-cap01.matrix.lab.
@@ -216,7 +215,6 @@ ipa dnsrecord-add 10.10.10.in-addr.arpa 108     --ptr-rec rh7-ocp4-bst01.matrix.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 110     --ptr-rec rh7-lms-srv01.matrix.lab.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 111     --ptr-rec rh7-jenkins-srv01.matrix.lab.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 112     --ptr-rec f5-bigip-01.matrix.lab.
-
 ipa dnsrecord-add 10.10.10.in-addr.arpa 130     --ptr-rec vmw-vcenter6.matrix.lab.
 ipa dnsrecord-add 10.10.10.in-addr.arpa 131     --ptr-rec win-2019-srv01.matrix.lab.
 ###############
@@ -254,6 +252,7 @@ ipa dnsrecord-add   proles.ocp4-mwn.matrix.lab    '*'       --a-rec 10.10.10.162
 #ipa dnsrecord-add   10.10.10.in-addr.arpa       161       --ptr-rec api.ocp4-mwn.matrix.lab.
 #ipa dnsrecord-add   10.10.10.in-addr.arpa       162       --ptr-rec *.apps.ocp4-mwn.matrix.lab.
 
+# OCP - Primary Cluster
 ipa dnszone-add linuxrevolution.com      --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
 ipa dnszone-add ocp4-mwn.linuxrevolution.com      --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
 ipa dnszone-add apps.ocp4-mwn.linuxrevolution.com --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
@@ -266,6 +265,7 @@ ipa dnsrecord-add   10.10.10.in-addr.arpa                161       --ptr-rec api
 ipa dnsrecord-add   10.10.10.in-addr.arpa                162       --ptr-rec *.apps.ocp4-mwn.linuxrevolution.com
 ipa dnsrecord-add   10.10.10.in-addr.arpa                163       --ptr-rec *.proles.ocp4-mwn.linuxrevolution.com
 
+# OCP - RHACM Cluster
 ipa dnszone-add    linuxrevolution.com               --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
 ipa dnszone-add    ocp4-acm.linuxrevolution.com      --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
 ipa dnszone-add    apps.ocp4-acm.linuxrevolution.com --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
@@ -281,7 +281,7 @@ ipa dnsrecord-add  jetson.lab     'elroy'   --a-rec   10.10.10.51
 ipa dnsrecord-add  10.10.10.in-addr.arpa       51   --ptr-rec elroy.jetson.lab.
 
 # THIS IS SPECIFIC TO MY HOME - it allows zone-transfer and "host -l matrix.lab" to run
-ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1,10.10.69.0/24' matrix.lab
+ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1;10.10.69.0/24' matrix.lab
 ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1' jetson.lab
 ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1' linuxrevolution.com
 ipa dnszone-mod --allow-transfer='192.168.0.0/24;10.10.10.0/24;127.0.0.1' ocp4-mwn.linuxrevolution.com
