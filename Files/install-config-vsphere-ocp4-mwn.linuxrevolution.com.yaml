@@ -28,7 +28,7 @@ platform:
   vsphere:
     apiVIP: 10.10.10.161
     cluster: OCP4
-    datacenter: HomeLab
+    datacenter: PisgahForest 
     defaultDatastore: datastore-shared-iscsi
     ingressVIP: 10.10.10.162
     network: DPortGroup-Guests
