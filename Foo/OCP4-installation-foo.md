@@ -2,6 +2,7 @@
 
 STATUS:  Work in Progress.  Trying to make this less dependent on the host it's running on and PULL
            everything needed for all the tasks.
+         This works for me at this point, but I am definitely open to suggestions for improvement.
 
 NOTES:  I have been running this installation as root - but, that is not necessary (other than the certificate stuff)
 
@@ -9,16 +10,76 @@ NOTES:  I have been running this installation as root - but, that is not necessa
 ## Pre-reqs
 NOTE:  you don't *always* need to do this part.  It is here (mostly) as a reference.
 
-### Download the Installer and Client
-```
-# TODO: instead of doing an rm, figure out how to rename it based on the version or something
-[ ! -d ${HOME}/OCP4 ] && mkdir ${HOME}/OCP4;  cd  ${HOME}/OCP4
-FILES="openshift-install-linux.tar.gz openshift-client-linux.tar.gz"
-for FILE in $FILES
-do
-  [ -f $FILE ] && mv $FILE $FILE-`date +%F`
-done
+# Some housekeeping
+sudo yum -y install wget tar unzip bind-utils
 
+### VMware Certificates | Install the certs from VMware vCenter
+You likely won't need to do this, it's just for reference.  I need to make a check to see whether
+the certs have already been imported.
+```
+sudo su -
+VC_HOSTNAME="vmw-vcenter6.matrix.lab"; SHORTDATE=`date +%F`
+
+CERT_BUNDLE=${VC_HOSTNAME}-${SHORTDATE}.zip
+[ ! -f $CERT_BUNDLE ] && {
+curl -k https://${VC_HOSTNAME}/certs/download.zip -o ${CERT_BUNDLE};
+unzip ${CERT_BUNDLE} -d /var/tmp/${VC_HOSTNAME};
+cp  /var/tmp/${VC_HOSTNAME}/certs/lin/*.0 /etc/pki/ca-trust/source/anchors/;
+update-ca-trust extract;
+}
+[ `whoami` == "root" ] && exit
+```
+
+## Getting Started | Typical OCP4 Install
+You should start your TMUX and *then* set your ENV vars
+
+```
+### Start your TMUX Session
+SHORTDATE=`date +%F`
+which tmux || sudo yum -y install tmux
+tmux new -s OCP4-${SHORTDATE}|| tmux attach -t OCP4-${SHORTDATE}
+
+### Set ENVIRONMENT VARS
+CLUSTER_NAME=ocp4-mwn
+BASE_DOMAIN=linuxrevolution.com
+HYPERVISOR=vsphere
+
+SHORTDATE=`date +%F`
+THEDATE=`date +%F-%H%M`
+OCP4_BASE=${HOME}/OCP4/; mkdir ${OCP4_BASE}; cd $_
+OCP4DIR=${OCP4_BASE}${CLUSTER_NAME}.${BASE_DOMAIN}-${THEDATE}
+INSTALL_DIR="${OCP4_BASE}/installer-${SHORTDATE}"
+
+# First, identify the files and make sure they are present
+### SSH tweaks
+SSH_KEY_FILE="${HOME}/.ssh/id_rsa-${BASE_DOMAIN}"
+SSH_KEY_FILE_PUB="${HOME}/.ssh/id_rsa-${BASE_DOMAIN}.pub"
+[ ! -f $SSH_KEY_FILE_PUB ] && { ssh-keygen -trsa -b 2048 -N '' -f $SSH_KEY_FILE; }
+SSH_KEY=$(cat $SSH_KEY_FILE_PUB)
+
+PULL_SECRET_FILE=${OCP4_BASE}pull-secret.txt
+[ ! -f $PULL_SECRET_FILE ] && { echo "ERROR: Pull Secret File Not Available"; exit 9; }
+PULL_SECRET=$(cat $PULL_SECRET_FILE)
+export BASE_DOMAIN BRIDGE_NAME SSH_KEY PULL_SECRET CLUSTER_NAME
+
+# Create all the Directories
+[ ! -d ${OCP4_BASE} ] && { mkdir ${OCP4_BASE}; cd $_; } || { cd ${OCP4_BASE}; }
+[ ! -d ${OCP4DIR} ] && { mkdir ${OCP4DIR}; cd $_; } || { cd ${OCP4DIR}; }
+[ ! -d ${INSTALL_DIR} ] && { mkdir ${INSTALL_DIR}; cd $_; } || { cd ${INSTALL_DIR}; }
+cd $OCP4_BASE
+
+# Since my repo name does not reflect the domain I use...
+case $BASE_DOMAIN in
+  linuxrevolution.com)
+    REPO_NAME=matrix.lab
+  ;;
+  *)
+    REPO_NAME=${BASE_DOMAIN}
+  ;;
+esac
+
+# Download the client and installer
+cd $INSTALL_DIR
 case `uname` in
   Linux)
     wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux.tar.gz
@@ -31,71 +92,6 @@ case `uname` in
 esac
 
 for FILE in openshift-install-*.tar.gz openshift-client-*.tar.gz; do tar -xvzf $FILE; done
-```
-
-## Getting Started | Typical OCP4 Install
-You should start your TMUX and *then* set your ENV vars
-
-### Start your TMUX Session
-```
-SHORTDATE=`date +%F`
-which tmux || sudo yum -y install tmux
-cd ${HOME}/OCP4/
-tmux new -s OCP4-${SHORTDATE}|| tmux attach -t OCP4-${SHORTDATE}
-```
-
-### Set ENVIRONMENT VARS
-```
-CLUSTER_NAME=ocp4-mwn
-BASE_DOMAIN=linuxrevolution.com
-HYPERVISOR=vsphere
-
-# Some housekeeping
-
-SHORTDATE=`date +%F`
-THEDATE=`date +%F-%H%M`
-OCP4_BASE=${HOME}/OCP4/
-OCP4DIR=${OCP4_BASE}${CLUSTER_NAME}.${BASE_DOMAIN}-${THEDATE}
-INSTALLER_DIR="installer-${SHORTDATE}"
-### SSH tweaks
-SSH_KEY_FILE="${HOME}/.ssh/id_rsa-${BASE_DOMAIN}"
-SSH_KEY_FILE_PUB="${HOME}/.ssh/id_rsa-${BASE_DOMAIN}.pub"
-PULL_SECRET_FILE=${OCP4_BASE}pull-secret.txt
-
-[ ! -f $SSH_KEY_FILE_PUB ] && { ssh-keygen -trsa -b 2048 -N '' -f $SSH_KEY_FILE; }
-[ ! -f $PULL_SECRET_FILE ] && { echo "ERROR: Pull Secret File Not Available"; exit 9; }
-
-PULL_SECRET=$(cat $PULL_SECRET_FILE)
-SSH_KEY=$(cat $SSH_KEY_FILE_PUB)
-export BASE_DOMAIN BRIDGE_NAME SSH_KEY PULL_SECRET CLUSTER_NAME
-
-[ ! -d ${OCP4_BASE} ] && { mkdir ${OCP4_BASE}; cd $_; } || { cd ${OCP4_BASE}; }
-
-case $BASE_DOMAIN in 
-  linuxrevolution.com)
-    REPO_NAME=matrix.lab
-  ;;
-  *)
-    REPO_NAME=${BASE_DOMAIN}
-  ;;
-esac
-```
-
-### VMware Certificates | Install the certs from VMware vCenter
-You likely won't need to do this, it's just for reference.
-```
-sudo su -
-VC_HOSTNAME="vmw-vcenter6.matrix.lab"; SHORTDATE=`date +%F`
-
-CERT_BUNDLE=${VC_HOSTNAME}-${SHORTDATE}.zip
-[ ! -f $CERT_BUNDLE ] && { 
-curl -k https://${VC_HOSTNAME}/certs/download.zip -o ${CERT_BUNDLE}; 
-unzip ${CERT_BUNDLE} -d $OCP4DIR/; 
-cp  $OCP4DIR/certs/lin/*.0 /etc/pki/ca-trust/source/anchors/; 
-update-ca-trust extract; 
-}
-[ `whoami` == "root" ] && exit
-
 ```
 
 ## Build the Installer (If you need some custom install options... otherwise, use the standard installer)
@@ -117,17 +113,24 @@ cd ${OCP4_BASE}
 #   platform.libvirt.network.if << This is the bridge that will be created
 #   baseDomain  << the domain you plan to use
 #   compute.replicas << you *may* wish to add compute nodes?
-vi install-config-libvirt-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml # Replace "NotAPassword"
+#   "NotAPassword" << replace this
+vi install-config-${HYPERVISOR}-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml 
 
 # The following creates the "install-config" - you should then make a copy of it
 #./openshift-install create install-config --dir=${OCP4DIR}/ --log-level=info
-# Using the previously created install config....
-envsubst < install-config-vsphere-ocp4-mwn.linuxrevolution.com.yaml > ${INSTALLER_DIR}/install-config.yaml
 
-mv $OCP4_BASE/{oc,kubectl,openshift-install} $INSTALLER_DIR 
-${INSTALLER_DIR}/openshift-install create cluster --dir=${OCP4DIR}/ --log-level=debug
+# Using the previously created install config.... Create an install-config.yaml from the template using 
+# the ENV variables set earlier (SSHKEY and PULLSECRET)
+envsubst < install-config-${HYPERVISOR}-ocp4-mwn.linuxrevolution.com.yaml > ${OCP4DIR}/install-config.yaml
+vi  ${OCP4DIR}/install-config.yaml
+#  Make sure DNS is working for the 2 (minimum) values
+nslookup api.${CLUSTER_NAME}.${BASE_DOMAIN}
+nslookup test.apps.${CLUSTER_NAME}.${BASE_DOMAIN}
 
+# Let's roll
+${INSTALL_DIR}/openshift-install create cluster --dir=${OCP4DIR}/ --log-level=debug
 
+# Troubleshooting
 ssh -i ~/.ssh/id_rsa-aperturelab core@192.168.126.10
   journalctl -b -f -u release-image.service -u bootkube.service
 

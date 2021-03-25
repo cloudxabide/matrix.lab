@@ -3,6 +3,10 @@ If you're looking for a VMware SME, look elsewhere ;-)
 I need to be proficient enough that I have *some* idea of what my customers are seeing.
 
 ## Getting Started
+You will first install ESXi on your physical nodes, then update some configuration on each individual node.
+After that, you will then deploy VCSA and start managing things from there.
+
+### Step 1
 Install your ESXi nodes and configure networking/storage/etc for basic settings...
 
 ## Enable/Configure Core Infrastructure Services  
@@ -19,9 +23,20 @@ You ABSOLUTELY should use NTP
 https://kb.vmware.com/s/article/57147
 
 ## Deploy vCenter
+At this point I am deploying vCenter from my Mac and this is a (very) brief overview
 
 ### Using OSX
-NOTE: while this is (probably) not necessary, I would mount the vCenter ISO and copy the contents to a local directoy on my Mac.  
+Download the Appliance https://my.vmware.com/group/vmware/downloads/info/slug/datacenter_cloud_infrastructure/vmware_vsphere/6_7  
+
+NOTE:  Figuring out how to download the 6.7 artifacts can be challenging.  VMware is REALLY pushing 7.x.  Ugh.
+
+ProTip: while this is (probably) not necessary, I would mount the vCenter ISO and copy the contents to a local directoy on my Mac.  
+Double-click the VCSA ISO, then run
+```
+mkdir ~/Downloads/VMware/vSphere_6.7/
+rsync -r /Volumes/VMware\ VCSA ~/Downloads/VMware/vSphere_6.7/
+```
+
 In finder, traverse to VMware-VCSA-all-6.7.0-14367737 | vcsa-us-installer | mac 
 Click on Installer, follow defaults  
 Select "Embedded Platform Services Controller"  
@@ -47,15 +62,30 @@ I actually learned something today about LACP (which might be specific to VMware
 | tank     | 10.10.10.15 | 10.10.10.35 | 172.16.10.35 |
 
 ### Add Virtual Distributed Port Group/Virtual Switch
+In the vSphere Client, select the Network (Globe with bar below it)
+
 #### Create New Distributed Virtual Switch (dVS)
 Click on the new DVS (DSwitch-Guest) | Configure | LACP 
 Click "+ NEW" 
-* name: (whatever)
-* number of ports: 2
+* name: DSwitch-Guests / Dswitch-Storage
+* number of uplinks: 2
+* Port group name: DPortGroup-Guests / DPortGroup-Storage
 * Mode: Passive
 * Load Balancing Mode: (Default)
 
 #### Add Hosts to DVS
+For each of your new DSwitch, right-click and select "Add and Manage Hosts..."
+* Add hosts
+* New hosts...
+Select your first "vmnic" and add it, then "Apply this uplink assignment to the rest of the hosts"
+
+#### Add VMkernel to each node and portGroup
+Go back to Hosts View
+right-click and select "Add Networking" | "VMkernel Network Adapter"
+Select an existing network | BROWSE... | Select one your networks
+ * Guests - Provisioning
+ * Storage - Provisioning, vMotion, vSAN 
+NOTE:  I am not sure how much the last bit matters
 
 ## Certificate nightmare
 If you rebuild your environment as often as I do, I think you will experience the same issues with the browsers and cert
