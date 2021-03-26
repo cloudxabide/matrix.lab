@@ -134,7 +134,6 @@ ${INSTALL_DIR}/openshift-install create cluster --dir=${OCP4DIR}/ --log-level=de
 ssh -i ~/.ssh/id_rsa-aperturelab core@192.168.126.10
   journalctl -b -f -u release-image.service -u bootkube.service
 
-
 export KUBECONFIG=${OCP4DIR}/auth/kubeconfig
 ```
 
