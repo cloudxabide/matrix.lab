@@ -309,7 +309,7 @@ wget https://github.com/cloudxabide/matrix.lab/raw/main/images/LinuxRevolution_R
 oc create configmap console-custom-logo --from-file ${OCP4DIR}/LinuxRevolution_RedGradient.png  -n openshift-config
 oc edit console.operator.openshift.io cluster
 # Update spec: customization: customLogoFile: {key,name}:
-## add after "operatorLogLevel: Normal"
+## add after "spec:operatorLogLevel: Normal"
   operatorLogLevel: Normal
   customization:
     customLogoFile:
