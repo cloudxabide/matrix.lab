@@ -41,9 +41,6 @@ Lastly, this is NOT a "how-to", an implementation guide, best-practices lab, etc
 | Hostname | Operating System         | Purpose      | Model, Proc, Mem Size                               | IP (public) | IP (storage) | Price (approx)
 | :--------|:------------------------:|:-------------|:----------------------------------------------------|:-----------:|:------------:|:--------------|
 | ZION     | Red Hat Enterprise Linux | Utility Host | NUC5i5RYB, Core(TM) i5-5250U CPU, 15G               | 10.10.10.10 | 172.16.10.10 | $900
-| NEO      | RHV 4.3                  | Hypervisor   | HP ProLiant ML30 Gen9, Xeon(R) CPU E3-1220 v5 , 62G | 10.10.10.11 | 172.16.10.11 | $1200
-| TRINITY  | RHV 4.3                  | Hypervisor   | HP ProLiant ML30 Gen9, Xeon(R) CPU E3-1220 v5 , 62G | 10.10.10.12 | 172.16.10.12 | $1200
-| MORPHEUS | RHV 4.3                  | Hypervisor   | HP ProLiant ML30 Gen9, Xeon(R) CPU E3-1220 v6 , 62G | 10.10.10.13 | 172.16.10.13 | $1200
 | DOZER    | VMware ESX 6.7u3         | OCP lab      | Asus z490-e Core(TM) i9-10850K, 131G                | 10.10.10.14 | 172.16.10.14 | $1900
 | TANK     | VMware ESX 6.7u3         | OCP lab      | Asus z490-e Core(TM) i9-10850K, 131G                | 10.10.10.15 | 172.16.10.15 | $1900
 | APOC     | VMware ESX 6.7u3         | OCP ACM      | ASUS X99-PRO/USB 3.1, Xeon(R) CPU E5-2630 v3 , 94G  | 10.10.10.18 | 172.16.10.18 | $800
@@ -81,11 +78,6 @@ echo "`dmidecode -s system-manufacturer` `dmidecode -s baseboard-product-name`,`
 
 ### SERAPH (offline)
 * FreeNAS host for NFS and iSCSI
-
-### NEO/TRINITY/MORPHEUS (offline)
-Our heroes will function as hypervisors or compute nodes.  
-* RHV Hypervisors (or RHEL 7 as RHV Hypervisors)  
-* These nodes will change purpose often.. not "long-running" hosts.
 
 ---
 ## Physical View
@@ -164,15 +156,6 @@ NOTE:  These memory values are not yet solidified.
                 +-------------+
                     FreeNAS
 
-
-                            RHHI-V 1.7 CLUSTER
-              +-------------+  +-----------+  +------------+
-              |             |  |           |  |            |
-              |     NEO     |  |  TRINITY  |  |  MORPHEUS  |
-              |             |  |           |  |            |
-              +-------------+  +-----------+  +------------+
-
-
 </pre>
 
 ---
@@ -185,17 +168,17 @@ primarily for the "NAS/SAN" interfaces.
 | Switch Port | Host     | Host Int | LAG | Switch Port | Host      | Host Int | LAG |
 |:-----------:|:--------:|:--------:|:---:|:-----------:|:---------:|:--------:|:---:|
 |  gi1        | zion     | enp0s25  |     | gi2         | sati      | enp0s25  |     |
-|  gi3        | neo      | eno1     |     | gi4         | trinity   | eno1     |     |
-|  gi5        | morpheus | eno1     |     | gi6         |           |          |     |
-|  gi7        | neo      | ens3f0   |  1  | gi8         | neo       | ens3f1   |  1  |                     
-|  gi9        | trinity  | ens3f0   |  2  | gi10        | trinity   | ens3f1   |  2  |
-|  gi11       | morpheus | ens3f0   |  3  | gi12        | morpheus  | ens3f1   |  3  |
+|  gi3        |          | eno1     |     | gi4         |           | eno1     |     |
+|  gi5        |          | eno1     |     | gi6         |           |          |     |
+|  gi7        |          | ens3f0   |  1  | gi8         |           | ens3f1   |  1  |                     
+|  gi9        |          | ens3f0   |  2  | gi10        |           | ens3f1   |  2  |
+|  gi11       |          | ens3f0   |  3  | gi12        |           | ens3f1   |  3  |
 |  gi13       |          |          |     | gi14        |           |          |     |
-|  gi15       | dozer    | vmnic0   |     | gi16        | dozer     | vmnic3   |     |
+|  gi15       |          | vmnic0   |     | gi16        |           | vmnic3   |     |
 |  gi17       | tank     | vmnic0   |     | gi18        | tank      | vmnic3   |     |
-|  gi19       | neo      | ens3f2   |  4  | gi20        | neo       | ens3f3   |  4  |
-|  gi21       | trinity  | ens3f2   |  5  | gi22        | trinity   | ens3f3   |  5  |
-|  gi23       | morpheus | ens3f2   |  6  | gi24        | morpheus  | ens3f3   |  6  | 
+|  gi19       |          | ens3f2   |  4  | gi20        |           | ens3f3   |  4  |
+|  gi21       |          | ens3f2   |  5  | gi22        |           | ens3f3   |  5  |
+|  gi23       |          | ens3f2   |  6  | gi24        |           | ens3f3   |  6  | 
 |   -         |    -     |    -     |  -  |   -         |           |    --    |     |
 |  gi25       |    -     |    -     |     | gi26        | LINK to LGS326-26 |      |    --    |     |
 |  gi27       |          |          |     | gi28        |           |      |    --    |     |
@@ -203,29 +186,29 @@ primarily for the "NAS/SAN" interfaces.
 ## 802.3ad LAG groups (configured on Mr Switch)
 | LAG  | Name 
 |:----:|:------
-| LAG1 | neo-storage
-| LAG2 | trinity-storage
-| LAG3 | morpheus-storage
-| LAG4 | neo-guest
-| LAG5 | trinity-guest
-| LAG6 | morpheus-guest 
+| LAG1 |    -storage
+| LAG2 |        -storage
+| LAG3 |         -storage
+| LAG4 |    -guest
+| LAG5 |        -guest
+| LAG6 |         -guest 
 | LAG7 | unassigned  
 | LAG8 | unassigned
 
-## Switch Layout - Linksys LGS326-26 (storage interfaces, ilo/mgmt interfaces)
+## Switch Layout - Linksys LGS326-26 (storage interfaces,    /mgmt interfaces)
 | Switch Port | Host     | Host Int | LAG | Switch Port | Host     | Host Int | LAG |
 |:-----------:|:--------:|:--------:|:---:|:-----------:|:--------:|:--------:|:---:|
 |  gi1        | seraph   | em0      |  1  | gi2         | seraph   | em1      |  1  |
 |  gi3        | apoc     | ens6f0   |  2  | gi4         | apoc     | ens6f1   |  2  |
-|  gi5        | neo      | ilo      |     | gi6         | trinity  | ilo      |     |
-|  gi7        | morpheus | ilo      |     | gi8         |          |          |     |
-|  gi9        | apoc     | eno1     |     | gi10        | dozer    | vmnic2   |     |
+|  gi5        |          |          |     | gi6         |          |          |     |
+|  gi7        |          |          |     | gi8         |          |          |     |
+|  gi9        | apoc     | eno1     |     | gi10        |          |          |     |
 |  gi11       | tank     | vmnic2   |     | gi12        | serpaph  | bge0     |     |
 |  gi13       |          |          |     | gi14        |          |          |     |
 |  gi15       |          |          |     | gi16        |          |          |     |
 |  gi17       |          |          |     | gi18        |          |          |     |
 |  gi19       |          |          |     | gi20        |          |          |     |
-|  gi21       | dozer    | vmnic1   |     | gi22        | dozer    | vmnic4   |     |
+|  gi21       |          |          |     | gi22        |          |          |     |
 |  gi23       | tank     | vmnic1   |     | gi24        | tank     | vmnic4   |     |
 |   -         |    -     |    -     |  -  |   -         |          |    --    |     |
 |  gi25       | Router   |    -     |     | gi26        | LINK to SG300-28   |      |    --    |     |
