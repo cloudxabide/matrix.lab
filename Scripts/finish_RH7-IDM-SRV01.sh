@@ -261,9 +261,9 @@ ipa dnsrecord-add   linuxrevolution.com                  '*'       --a-rec   10.
 ipa dnsrecord-add   ocp4-mwn.linuxrevolution.com         'api'     --a-rec   10.10.10.161
 ipa dnsrecord-add   apps.ocp4-mwn.linuxrevolution.com    '*'       --a-rec   10.10.10.162
 ipa dnsrecord-add   proles.ocp4-mwn.linuxrevolution.com  '*'       --a-rec   10.10.10.163
-ipa dnsrecord-add   10.10.10.in-addr.arpa                161       --ptr-rec api.ocp4-mwn.linuxrevolution.com
-ipa dnsrecord-add   10.10.10.in-addr.arpa                162       --ptr-rec *.apps.ocp4-mwn.linuxrevolution.com
-ipa dnsrecord-add   10.10.10.in-addr.arpa                163       --ptr-rec *.proles.ocp4-mwn.linuxrevolution.com
+ipa dnsrecord-add   10.10.10.in-addr.arpa                161       --ptr-rec api.ocp4-mwn.linuxrevolution.com.
+ipa dnsrecord-add   10.10.10.in-addr.arpa                162       --ptr-rec *.apps.ocp4-mwn.linuxrevolution.com.
+ipa dnsrecord-add   10.10.10.in-addr.arpa                163       --ptr-rec *.proles.ocp4-mwn.linuxrevolution.com.
 
 # OCP - RHACM Cluster
 ipa dnszone-add    linuxrevolution.com               --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
@@ -271,8 +271,8 @@ ipa dnszone-add    ocp4-acm.linuxrevolution.com      --admin-email=root@matrix.l
 ipa dnszone-add    apps.ocp4-acm.linuxrevolution.com --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
 ipa dnsrecord-add  ocp4-acm.linuxrevolution.com      'api'     --a-rec   10.10.10.171
 ipa dnsrecord-add  apps.ocp4-acm.linuxrevolution.com '*'       --a-rec   10.10.10.172
-ipa dnsrecord-add  10.10.10.in-addr.arpa              171      --ptr-rec api.ocp4-acm.linuxrevolution.com
-ipa dnsrecord-add  10.10.10.in-addr.arpa              172      --ptr-rec *.apps.ocp4-acm.linuxrevolution.com
+ipa dnsrecord-add  10.10.10.in-addr.arpa              171      --ptr-rec api.ocp4-acm.linuxrevolution.com.
+ipa dnsrecord-add  10.10.10.in-addr.arpa              172      --ptr-rec *.apps.ocp4-acm.linuxrevolution.com.
 }
 
 ipa dnszone-add    jetson.lab --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
