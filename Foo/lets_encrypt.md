@@ -5,7 +5,7 @@ Purpose:  To detail what is necessary to utilize LetsEncrypt certs in your
           cluster.  Additionally, I may try to figure out where the certs you
           provide in your inventory, actually end up on the filesystem.
 Credit:   Please see the references at the bottom of this doc.  A fellow Red Hatter (Karan Singh) wrote a great article.
-
+Note:     You can run this as a non-root user - in my case, morpheus
 
 ## Overview
 My environment is a home lab which has a single ingress/egress point and a single IP.  I also have a domain (linuxrevolution.com) with DNS provided by route53.  Generally OpenShift has a tertiary domain provided - "cloudapps" is usually referenced - in my case it is "ocp4-mwn" (ocp4-mwn.linuxrevolution.com).  My tertiary domain is also handled by route53.
@@ -36,6 +36,7 @@ export AWS_ACCESS_KEY_ID  AWS_SECRET_ACCESS_KEY
 echo $AWS_ACCESS_KEY_ID
 [ -z $AWS_SECRET_ACCESS_KEY ] && echo "hol'up - you did not set your AWSCLI vars yet"
 
+# The following is the values you would get from the commands that follow 
 {
 LE_API=api.ocp4-mwn.linuxrevolution.com
 LE_TLD=linuxrevolution.com
@@ -54,6 +55,7 @@ issue_new_cert() {
   ${HOME}/acme.sh/acme.sh --issue -d ${LE_API} -d *.${LE_WILDCARD} -d *.${LE_TLD} --dns dns_aws
 }
 
+# Create the *.pem files
 ${HOME}/acme.sh/acme.sh --install-cert -d ${LE_API} -d *.${LE_WILDCARD} -d *.${LE_TLD} --cert-file ${CERTDIR}/cert.pem --key-file ${CERTDIR}/key.pem --fullchain-file ${CERTDIR}/fullchain.pem --ca-file ${CERTDIR}/ca.cer
 ```
 
@@ -71,9 +73,11 @@ oc patch ingresscontroller default -n openshift-ingress-operator --type=merge --
 # WARNING - this has limited testing at this point.  It appears to work though.
 oc create secret tls api-certs --cert=${CERTDIR}/fullchain.pem --key=${CERTDIR}/key.pem -n openshift-config
 oc patch apiserver cluster --type=merge --patch='{"spec": { "servingCerts": {"namedCertificates": [{"names": ["api.ocp4-mwn.linuxrevolution.com"], "servingCertificate": {"name": "api-certs" }}]}}}'
+```
 
 # Cleanup (start over - remove the comment signs to use this command)
-# oc delete # secret # lts # router-certs -n # openshift-ingress
+```
+oc delete # secret # lts # router-certs -n # openshift-ingress
 ```
 
 ### Public Doc on how to use Lets Encrypt in an automated fashion
