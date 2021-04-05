@@ -26,18 +26,20 @@ H3      {
 TH              {
                 BACKGROUND:     #cdcdcd;
                 color:            #333355;
-               # COLOR:          #ed3434;
                 FONT-WEIGHT:    bold;
                 TEXT-ALIGN:     center; }
 
 
-A:link      {color: 	#0000F7;
-		TEXT-DECORATION: 	none}
-A:visited   {color:  		#3F3EC8;
-		TEXT-DECORATION: 	none}
-A:hover	{color:		orange;
-		TEXT-DECORATION: 	none}
-A:active    {color:  #red}
+A:link      	{
+                color: 			#0000F7;
+		TEXT-DECORATION: 	none; }
+A:visited   	{ 
+                color:  		#3F3EC8;
+		TEXT-DECORATION: 	none; }
+A:hover		{
+		color:			orange;
+		TEXT-DECORATION: 	none; }
+A:active     	{color:  #red}
 
     .container {
           width:            960px;
@@ -74,7 +76,6 @@ A:active    {color:  #red}
           font-weight:      normal;
           font-style:       Normal;
           text-decoration:  none;
-;          color:            #ff3355;
           color:            #333355;
           text-indent:      0px;
           padding-bottom:   6pt;  }
