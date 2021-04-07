@@ -27,7 +27,7 @@
 (Storage) - OCS
 
 #### Total Cluster Allocation 
-|  Phase            | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage |
+|  Phase            | -                 | -     | -          | -       | -          | - | vCPU | RAM | Storage |
 |:------------------|:------------------|:----:|:------------|:--------|:-----------|:-:|-----|:-----|:------- |
 | Initial           |                   |      |             |         |            | = | 22   | 88  | 840     |
 | Day 2             |                   |      |             |         |            | = | 36   | 120 | 2256    |
