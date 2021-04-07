@@ -16,22 +16,22 @@
 |                   |                   |      |             |         | **totals** | = | 22   | 88  | 840     |
 
 #### Phase (Day 2)
-| Node              | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage |
-|:------------------|:------------------|:----:|:------------|:--------|:-----------|:-:|-----|:-----|:------- |
-| Compute (Infra)   | RHCOS             | 4    | 16 GB       | 120 GB  | 3          | - | 12   | 48  | 360     |
-| Compute (Storage) | RHCOS             | 8    | 24 GB       | 120 GB  | 3          | - | 24   | 72  | 360 (*) |
-|                   |                   |      |             |         | **totals** | = | 36   | 120 | 720     |
+| Node              | Operating System  | vCPU | Virtual RAM | Storage | Storage (OCS) | Qty        |   | vCPU | RAM | Storage | Storage (OCS) |
+|:------------------|:------------------|:----:|:------------|:--------|:-------------:|:-----------|:-:|-----|:-----|:------- |:--------------|
+| Compute (Infra)   | RHCOS             | 4    | 16 GB       | 120 GB  | N/A           | 3          | - | 12   | 48  | 360     | N/A           |
+| Compute (Storage) | RHCOS             | 8    | 24 GB       | 120 GB  | 512 GB        | 3          | - | 24   | 72  | 360 (*) | 1536          | 
+|                   |                   |      |             |         |               | **totals** | = | 36   | 120 | 720     | 1536
 
 (*)  This will depend on projected storage usage.  Keep in mind that OCS uses CEPH with 3x replication.  Meaning storage required is N * 3, where is N is the usable storage.  CEPH *does* use COW which can optimally utilize the storage.  
 (Infra) - EFK stack  
 (Storage) - OCS
 
 #### Total Cluster Allocation 
-|  Phase            | Operating System  | vCPU | Virtual RAM | Storage | Qty        |   | vCPU | RAM | Storage |
+|  Phase            | -                 | -     | -          | -       | -          | - | vCPU | RAM | Storage |
 |:------------------|:------------------|:----:|:------------|:--------|:-----------|:-:|-----|:-----|:------- |
 | Initial           |                   |      |             |         |            | = | 22   | 88  | 840     |
-| Day 2             |                   |      |             |         |            | = | 36   | 120 | 720     |
-|                   |                   |      |             |         | **totals** | = | 58   | 208 | 1560    |
+| Day 2             |                   |      |             |         |            | = | 36   | 120 | 2256    |
+|                   |                   |      |             |         | **totals** | = | 58   | 208 | 3096    |
 
 
 ### ACM Cluster
