@@ -30,13 +30,14 @@ fi
 # Automatically determine if node is a VC or ESXi endpoint
 curl --connect-timeout 10 -k -s "https://${NODE_IP}" | grep 'forAdmins' > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-    NODE_TYPE=vc
+    NODE_TYPE=vcenter
 else
     NODE_TYPE=esxi
 fi
+echo "Environment Type: $NODE_TYPE"
 
 DOWNLOAD_PATH=/tmp/cert.zip
-if [ "${NODE_TYPE}" == "vc" ]; then
+if [ "${NODE_TYPE}" == "vcenter" ]; then
   # Determine if VC is Windows VC or VCSA by checking VAMI endpoint
   if [ $(curl --connect-timeout 10 -s -o /dev/null -w "%{http_code}" -i -k https://${NODE_IP}:5480) -eq 200 ]; then
     # Install Trusted root CA for vCenter Server Appliance
@@ -55,7 +56,7 @@ if [ "${NODE_TYPE}" == "vc" ]; then
       echo "Importing to VC SSL Certificate to Certificate Store"
       if [ "${OS_TYPE}" == "OSX" ]; then
         echo "# security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain \"/tmp/certs/mac/${SOURCE_CERT##*/}.crt\" "
-        #security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "/tmp/certs/mac/${SOURCE_CERT##*/}.crt"
+        security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "/tmp/certs/mac/${SOURCE_CERT##*/}.crt"
       else
         echo "# cp \"${i}\" \"/usr/local/share/ca-certificates/${SOURCE_CERT##*/}.crt\" "
         #cp "${i}" "/usr/local/share/ca-certificates/${SOURCE_CERT##*/}.crt"
