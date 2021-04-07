@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 #set -o errexit
 readonly LOG_FILE="/root/post_install.sh.log"
 echo "Output being redirected to log file - to see output:"
@@ -183,7 +182,7 @@ syspurpose set sla "Self-Support"; sleep 5
 syspurpose set role ""; sleep 5
 syspurpose set usage ""
 which insights-client || yum -y install insights-client
-insights-client --register
+insights-client --register --group MATRIXLAB
 
 #  Update Host and reboot
 echo "NOTE:  update and reboot"
