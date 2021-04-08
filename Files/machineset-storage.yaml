@@ -41,7 +41,7 @@ spec:
           numCPUs: 4
           numCoresPerSocket: 1
           snapshot: ""
-          template: <vm_template_name> 
+          template: '$INFRASTRUCTURE_ID-rhcos'
           userDataSecret:
             name: worker-user-data
           workspace:
