@@ -47,6 +47,6 @@ spec:
           workspace:
             datacenter: PisgahForest
             datastore: datastore-shared-iscsi
-            #folder: <vcenter_vm_folder_path> 
-            #resourcepool: <vsphere_resource_pool> 
+            folder: '/PisgahForest/vm/$INFRASTRUCTURE_ID'
+            resourcepool: '/PisgahForest/host/OCP4/Resources'
             server: vmw-vcenter6.matrix.lab
