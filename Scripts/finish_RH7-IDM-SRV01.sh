@@ -241,6 +241,43 @@ do
   sleep 1
 done
 ####
+ocp3() {
+ipa dnszone-add matrix.lab      --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
+ipa dnszone-add ocp3-wnc.matrix.lab      --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
+ipa dnszone-add apps.ocp3-wnc.matrix.lab --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
+ipa dnszone-add proles.ocp3-wnc.matrix.lab --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true
+ipa dnsrecord-add   matrix.lab                  '*'       --a-rec   10.10.10.152
+ipa dnsrecord-add   ocp3-wnc.matrix.lab         'api'     --a-rec   10.10.10.151
+ipa dnsrecord-add   apps.ocp3-wnc.matrix.lab    '*'       --a-rec   10.10.10.152
+ipa dnsrecord-add   proles.ocp3-wnc.matrix.lab  '*'       --a-rec   10.10.10.153
+ipa dnsrecord-add   10.10.10.in-addr.arpa                151       --ptr-rec api.ocp3-wnc.matrix.lab.
+ipa dnsrecord-add   10.10.10.in-addr.arpa                152       --ptr-rec *.apps.ocp3-wnc.matrix.lab.
+ipa dnsrecord-add   10.10.10.in-addr.arpa                153       --ptr-rec *.proles.ocp3-wnc.matrix.lab.
+
+# Host Entries
+ipa dnsrecord-add matrix.lab rh7-ocp3-proxy  --a-rec 10.10.10.150
+ipa dnsrecord-add matrix.lab openshift       --cname-rec='rh7-ocp3-proxy.matrix.lab.'
+ipa dnsrecord-add matrix.lab ocp3            --cname-rec='rh7-ocp3-proxy.matrix.lab.'
+ipa dnsrecord-add matrix.lab api             --cname-rec='rh7-ocp3-proxy.matrix.lab.'
+ipa dnsrecord-add matrix.lab rh7-ocp3-mst01  --a-rec 10.10.10.151
+ipa dnsrecord-add matrix.lab rh7-ocp3-mst02  --a-rec 10.10.10.152
+ipa dnsrecord-add matrix.lab rh7-ocp3-mst03  --a-rec 10.10.10.153
+ipa dnsrecord-add matrix.lab rh7-ocp3-inf01  --a-rec 10.10.10.154
+ipa dnsrecord-add matrix.lab rh7-ocp3-inf02  --a-rec 10.10.10.155
+ipa dnsrecord-add matrix.lab rh7-ocp3-inf03  --a-rec 10.10.10.156
+ipa dnsrecord-add matrix.lab rh7-ocp3-app01  --a-rec 10.10.10.157
+ipa dnsrecord-add matrix.lab rh7-ocp3-app02  --a-rec 10.10.10.158
+ipa dnsrecord-add matrix.lab rh7-ocp3-app03  --a-rec 10.10.10.159
+
+ipa dnsrecord-add matrix.lab rh7-ocp3-ocs01  --a-rec 10.10.10.141
+ipa dnsrecord-add matrix.lab rh7-ocp3-ocs02  --a-rec 10.10.10.142
+ipa dnsrecord-add matrix.lab rh7-ocp3-ocs03  --a-rec 10.10.10.143
+ipa dnsrecord-add matrix.lab rh7-ocp3-ocs04  --a-rec 10.10.10.144
+ipa dnsrecord-add matrix.lab rh7-ocp3-ocs11  --a-rec 10.10.10.145
+ipa dnsrecord-add matrix.lab rh7-ocp3-ocs12  --a-rec 10.10.10.146
+ipa dnsrecord-add matrix.lab rh7-ocp3-ocs13  --a-rec 10.10.10.147
+ipa dnsrecord-add matrix.lab rh7-ocp3-ocs14  --a-rec 10.10.10.148
+}
 
 ocp4() {
 #ipa dnszone-add ocp4-mwn.matrix.lab      --admin-email=root@matrix.lab --minimum=3000 --dynamic-update=true

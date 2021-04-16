@@ -114,7 +114,7 @@ cd ${OCP4_BASE}
 #   baseDomain  << the domain you plan to use
 #   compute.replicas << you *may* wish to add compute nodes?
 #   "NotAPassword" << replace this
-vi install-config-${HYPERVISOR}-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml 
+cat install-config-${HYPERVISOR}-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml 
 
 # The following creates the "install-config" - you should then make a copy of it
 #./openshift-install create install-config --dir=${OCP4DIR}/ --log-level=info
@@ -282,7 +282,13 @@ oc get clusteroperator image-registry
 while true; do oc get clusteroperator image-registry; sleep 2; done
 ```
 
-### Increase the worker node capacity, if necessary:
+### Increase the worker node capacity, if necessary (or scale down to save capacity:
+I scale my cluster back for workers to allow for more infra and OCS nodes
+```
+MACHINESET=$(oc get machineset -n openshift-machine-api | grep -v ^NAME | awk '{ print $1 }')
+oc scale --replicas=2 machineset $MACHINESET  -n openshift-machine-api
+```
+
 ```
 oc edit machineset -n openshift-machine-api
 

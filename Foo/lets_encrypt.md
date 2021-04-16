@@ -70,7 +70,6 @@ done
 oc create secret tls router-certs --cert=${CERTDIR}/fullchain.pem --key=${CERTDIR}/key.pem -n openshift-ingress
 oc patch ingresscontroller default -n openshift-ingress-operator --type=merge --patch='{"spec": { "defaultCertificate": { "name": "router-certs" }}}'
 
-# WARNING - this has limited testing at this point.  It appears to work though.
 oc create secret tls api-certs --cert=${CERTDIR}/fullchain.pem --key=${CERTDIR}/key.pem -n openshift-config
 oc patch apiserver cluster --type=merge --patch='{"spec": { "servingCerts": {"namedCertificates": [{"names": ["api.ocp4-mwn.linuxrevolution.com"], "servingCertificate": {"name": "api-certs" }}]}}}'
 ```
