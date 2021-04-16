@@ -61,6 +61,7 @@ echo "`dmidecode -s system-manufacturer` `dmidecode -s baseboard-product-name`,`
 * KVM Hypervisor 
  *  Red Hat IDM (rh7-idm-srv02)
  *  LibreNMS (rh7-lms-srv01)
+ *  Red Hat Ent Linux 8 (rh8-util-srv02)
 
 ### DOZER / TANK
 * VMware ESX 6.7 Hypervisors
@@ -68,15 +69,11 @@ echo "`dmidecode -s system-manufacturer` `dmidecode -s baseboard-product-name`,`
   * OCS 4
 
 ### APOC (the workhorse)
+* VMware ESX 6.7 Hypervisors
+* Running ESX to test OCP4 IPI for ACM
 * This box has a lot of disk and memory to run the long-running VMs.
-* KVM Hypervisor hosting the following Guests:  
-  *  Satellite 6 (rh7-sat6-srv01)
-  *  Ansible Tower (rh7-ans-srv01)
 
-### CYPHER (offline)
-* Running ESX to test OCP4 IPI
-
-### SERAPH (offline)
+### SERAPH 
 * FreeNAS host for NFS and iSCSI
 
 ---
@@ -92,7 +89,6 @@ echo "`dmidecode -s system-manufacturer` `dmidecode -s baseboard-product-name`,`
 | Auth           | Authentication <BR> Authorization | 10.10.10.121 <BR> 10.10.10.122                |
 | PXE, TFTP, WWW | Kickstart for network             | 10.10.10.10 (*)                               |
 | DHCP	         | IP addresses for Guests           | 10.10.10.192-248                              |
-
 
 * otherwise: 10.10.10.102 if Satellite is configured to provide Provisioning
 
@@ -128,7 +124,6 @@ NOTE:  These memory values are not yet solidified.
                          +------- v--------+
       Cisco SG328        |    MR SWITCH    |
                          +-----------------+
-                                  |
                                   |
                                   |
                                   |
