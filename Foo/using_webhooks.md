@@ -7,7 +7,7 @@ I have little/no interest in doing this anywhere other than Github at this time.
 
 ### Retrive the a Secret (Openshift)
 ```
-oc get bc wwwlinuxrevolutioncom -o jsonpath='{ .spec.triggers[?(@.type=="GitHub")].github.secret }'
+oc get bc wwwlinuxrevolutioncom -n welcomepage -o jsonpath='{ .spec.triggers[?(@.type=="GitHub")].github.secret }'
 ```
 
 ### Retrieve the Webhook Payload URL

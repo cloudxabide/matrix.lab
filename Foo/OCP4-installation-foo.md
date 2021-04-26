@@ -40,9 +40,16 @@ which tmux || sudo yum -y install tmux
 tmux new -s OCP4-${SHORTDATE}|| tmux attach -t OCP4-${SHORTDATE}
 
 ### Set ENVIRONMENT VARS
+# VMware - mwn 
 CLUSTER_NAME=ocp4-mwn
 BASE_DOMAIN=linuxrevolution.com
 HYPERVISOR=vsphere
+
+# AWS - us-east-1
+REGION=us-east-1
+CLUSTER_NAME=ocp4-${REGION}
+BASE_DOMAIN=cloudxabide.com
+HYPERVISOR=aws
 
 SHORTDATE=`date +%F`
 THEDATE=`date +%F-%H%M`
@@ -121,7 +128,9 @@ cat install-config-${HYPERVISOR}-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml
 
 # Using the previously created install config.... Create an install-config.yaml from the template using 
 # the ENV variables set earlier (SSHKEY and PULLSECRET)
-envsubst < install-config-${HYPERVISOR}-ocp4-mwn.linuxrevolution.com.yaml > ${OCP4DIR}/install-config.yaml
+#envsubst < install-config-${HYPERVISOR}-ocp4-mwn.linuxrevolution.com.yaml > ${OCP4DIR}/install-config.yaml
+envsubst < install-config-${HYPERVISOR}-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml > ${OCP4DIR}/install-config.yaml
+
 vi  ${OCP4DIR}/install-config.yaml
 #  Make sure DNS is working for the 2 (minimum) values
 nslookup api.${CLUSTER_NAME}.${BASE_DOMAIN}
