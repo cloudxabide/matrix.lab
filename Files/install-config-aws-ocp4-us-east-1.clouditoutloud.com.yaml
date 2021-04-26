@@ -23,15 +23,11 @@ networking:
   - cidr: 10.0.0.0/20
   networkType: OpenShiftSDN
   serviceNetwork:
-  - 172.30.0.0/12
+  - 172.30.0.0/16
 platform:
   aws:
     region: us-east-1
-    subnets:
-    - subnet-1
-    - subnet-2
-    - subnet-3
 fips: false
 publish: External
-'pullSecret: '$PULL_SECRET'
+pullSecret: '$PULL_SECRET'
 sshKey: '$SSH_KEY'
