@@ -51,6 +51,7 @@ CLUSTER_NAME=ocp4-${REGION}
 BASE_DOMAIN=cloudxabide.com
 HYPERVISOR=aws
 
+### You have to reset the ENV var now that you're in the tmux session
 SHORTDATE=`date +%F`
 THEDATE=`date +%F-%H%M`
 OCP4_BASE=${HOME}/OCP4/; mkdir ${OCP4_BASE}; cd $_
@@ -114,6 +115,7 @@ cd -
 eval "$(ssh-agent -s)"
 ssh-add ${HOME}/.ssh/id_rsa-${BASE_DOMAIN}
 cd ${OCP4_BASE}
+## Pull down a copy of the install-config with no personal data (you'll add your own personal data in a bit)
 [ ! -f install-config-${HYPERVISOR}-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml ] && { wget https://raw.githubusercontent.com/cloudxabide/${REPO_NAME}/main/Files/install-config-${HYPERVISOR}-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml; echo "You need to update the config file found in this directory"; }
 
 # Update the following values
@@ -128,7 +130,6 @@ cat install-config-${HYPERVISOR}-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml
 
 # Using the previously created install config.... Create an install-config.yaml from the template using 
 # the ENV variables set earlier (SSHKEY and PULLSECRET)
-#envsubst < install-config-${HYPERVISOR}-ocp4-mwn.linuxrevolution.com.yaml > ${OCP4DIR}/install-config.yaml
 envsubst < install-config-${HYPERVISOR}-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml > ${OCP4DIR}/install-config.yaml
 
 vi  ${OCP4DIR}/install-config.yaml
@@ -139,15 +140,20 @@ nslookup test.apps.${CLUSTER_NAME}.${BASE_DOMAIN}
 # Let's roll
 ${INSTALL_DIR}/openshift-install create cluster --dir=${OCP4DIR}/ --log-level=debug
 
-# Troubleshooting
-ssh -i ~/.ssh/id_rsa-aperturelab core@192.168.126.10
-  journalctl -b -f -u release-image.service -u bootkube.service
 
 export KUBECONFIG=${OCP4DIR}/auth/kubeconfig
 ```
 
 ## Troubleshooting the Install
-This is a work in progress  
+You can review the progress directly from the bootstrap system  
+
+
+TL;DR:
+```
+ssh -i ~/.ssh/id_rsa-aperturelab core@192.168.126.10
+  journalctl -b -f -u release-image.service -u bootkube.service
+```
+
 
 It appears that initially you will initially see:
 * "Golden Image" (rhcos) node
