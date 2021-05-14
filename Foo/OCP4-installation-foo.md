@@ -1,5 +1,4 @@
 # OCP4 Installation (VMware/IPI)
-
 STATUS:  Work in Progress.  Trying to make this less dependent on the host it's running on and PULL
            everything needed for all the tasks.
          This works for me at this point, but I am definitely open to suggestions for improvement.
@@ -48,7 +47,7 @@ HYPERVISOR=vsphere
 # AWS - us-east-1
 REGION=us-east-1
 CLUSTER_NAME=ocp4-${REGION}
-BASE_DOMAIN=cloudxabide.com
+BASE_DOMAIN=clouditoutloud.com
 HYPERVISOR=aws
 
 ### You have to reset the ENV var now that you're in the tmux session
@@ -131,15 +130,18 @@ cat install-config-${HYPERVISOR}-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml
 # Using the previously created install config.... Create an install-config.yaml from the template using 
 # the ENV variables set earlier (SSHKEY and PULLSECRET)
 envsubst < install-config-${HYPERVISOR}-${CLUSTER_NAME}.${BASE_DOMAIN}.yaml > ${OCP4DIR}/install-config.yaml
-
 vi  ${OCP4DIR}/install-config.yaml
+
 #  Make sure DNS is working for the 2 (minimum) values
+case $HYPERVISOR in 
+  vsphere)
 nslookup api.${CLUSTER_NAME}.${BASE_DOMAIN}
 nslookup test.apps.${CLUSTER_NAME}.${BASE_DOMAIN}
+  ;;
+esac
 
 # Let's roll
-${INSTALL_DIR}/openshift-install create cluster --dir=${OCP4DIR}/ --log-level=debug
-
+${INSTALL_DIR}/openshift-install create cluster --dir=${OCP4DIR}/ --log-level=debug 2&>1 ${OCP4DIR}/installation.log
 
 export KUBECONFIG=${OCP4DIR}/auth/kubeconfig
 ```
@@ -182,41 +184,6 @@ journalctl -f -u dhcpd
 Dec 02 12:11:19 rh7-sat6-srv01.matrix.lab dhcpd[9566]: DHCPREQUEST for 10.10.10.199 from 00:50:56:a5:40:2e (ocp4-mwn-kkdz5-worker-rnphr) via ens192
 ```
 
-## OCP4 on RHV (RHHI-V)
-Status:  Untested.  I do not have an environment to test this with yet.
-
-Datastore: vmstore
-Cluster Name: Default
-
-```
-curl -k -u admin@internal:NotAPassword https://rh7-rhv4-mgr01.matrix.lab/ovirt-engine/api
-dig api.ocp4-mwn.matrix.lab
-dig test.apps.ocp4-mwn.matrix.lab
-dig *.apps.ocp4-mwn.matrix.lab | grep "^*"
-curl -k 'https://rh7-rhv4-mgr01.matrix.lab/ovirt-engine/services/pki-resource?resource=ca-certificate&format=X509-PEM-CA' -o /tmp/ca.pem
-chmod 0644 /tmp/ca.pem
-cp -p /tmp/ca.pem /etc/pki/ca-trust/source/anchors/ca-rh7-rhv4-mgr01.pem
-update-ca-trust
-```
-
-I have a bit of an intersting situation - my HomeLab has it's own DNS (matrix.lab) but the exposed IP uses (linuxrevolution.com).  Therefore, I build my cluster using matrix.lab
-- Values I used
-
-```
-? SSH Public Key /root/.ssh/id_rsa.pub
-? Platform ovirt
-? oVirt cluster Default
-? oVirt storage domain vmstore
-? oVirt network guest
-? Internal API virtual IP 10.10.10.161
-? Internal DNS virtual IP 10.10.10.163
-? Ingress virtual IP 10.10.10.162
-? Base Domain matrix.lab
-? Cluster Name ocp4-mwn
-? Pull Secret [? for help]
-```
-
-
 ## Login to the Environment
 
 ```
@@ -225,11 +192,15 @@ oc login -u kubeadmin -p `cat $(find $OCP4DIR/ -name kubeadmin-password)`  https
 oc get nodes
 ```
 
+## Update Certs 
+I created a separate doc for the Cert section as it is not a *requirement*  
+review [LetsEncrypt-HowTo](./lets_encrypt.md)  
+NOTE:  This *should* be managed with CertManager (some time in the future).
+
 ## Registry (NFS)
 For *my* enviromment, NFS was the ideal target for the registry as it provides RWX as is ideal.
 NOTE: it is assumed that OCP has been successfully installed by this time.
 Also - I had to do some nonsense to make my freeNAS work for this (and it's likely NOT ideal)
-
 
 ### Create the yaml definition for the registry PV and PVC
 #### NOTE: go remove seraph:/mnt/raidZ/nfs-registry/docker
@@ -276,7 +247,7 @@ kubectl -n openshift-image-registry get pvc
 ```
 
 ### Update the ImageRegistry Operator Config 
-TL;DR: update  
+TL;DR: make the following update  
 ```
 managementState: Removed
 managementState: Managed
@@ -325,6 +296,7 @@ oc scale --replicas=3 machineset $MACHINESET  -n openshift-machine-api
 ## Customize the OpenShift Console logo
 
 ```
+cd ${OCP4DIR}
 wget https://github.com/cloudxabide/matrix.lab/raw/main/images/LinuxRevolution_RedGradient.png -O ${OCP4DIR}/LinuxRevolution_RedGradient.png
 
 oc create configmap console-custom-logo --from-file ${OCP4DIR}/LinuxRevolution_RedGradient.png  -n openshift-config
@@ -371,9 +343,6 @@ oc apply -f ${OCP4DIR}/HTPasswd-CR
 oc adm policy add-cluster-role-to-user cluster-admin ocpadmin
 ```
 
-## Add Legit Certs
-review [LetsEncrypt-HowTo](./lets_encrypt.md)  
-NOTE:  This *should* be done with CertManager (some time in the future).
 
 ## References
 https://www.virtuallyghetto.com/2020/07/using-the-new-installation-method-for-deploying-openshift-4-5-on-vmware-cloud-on-aws.html

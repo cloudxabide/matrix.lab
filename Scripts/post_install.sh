@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+[ `id` -ne 0 ] && { echo "ERROR: you should run this as root yo"; exit 9 }
+
+
 #set -o errexit
 readonly LOG_FILE="/root/post_install.sh.log"
 echo "Output being redirected to log file - to see output:"
@@ -146,6 +150,12 @@ systemctl enable snmpd --now
 
 firewall-cmd --permanent --add-service=snmp
 firewall-cmd --reload
+
+case `lsb_release  -d` in 
+  'Ubuntu 18.04.5 LTS')
+    echo "agentAddress udp:0.0.0.0:161" >> /etc/snmp/snmpd.conf
+  ;;
+esac
 
 # Install Sysstat (SAR) and PCP
 yum -y install sysstat pcp

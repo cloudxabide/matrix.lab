@@ -11,10 +11,21 @@ OCP4APIPORT=6443
 echo | openssl s_client -connect $OCP4API:$OCP4APIPORT -servername $OCP4API  | sed -n /BEGIN/,/END/p > $OCP4API.pem
 oc login --certificate-authority=$OCP4API.pem --username=`whoami` --password=$PASSWORD --server=$OCP4API:$OCP4APIPORT
 ```
+
+Or.. login as kubeadmin
+```
+USERNAME=kubeadmin
+PASSWORD=$(cat $(find ${HOME}/OCP4/*mwn* -name kubeadmin-password))
+OCP4API=api.ocp4-mwn.linuxrevolution.com
+OCP4APIPORT=6443
+echo | openssl s_client -connect $OCP4API:$OCP4APIPORT -servername $OCP4API  | sed -n /BEGIN/,/END/p > $OCP4API.pem
+oc login --certificate-authority=$OCP4API.pem --username=$USERNAME --password=$PASSWORD --server=$OCP4API:$OCP4APIPORT
+```
+
 ## www_linuxrevolution_com
 ```
 MYPROJ="welcomepage"
-oc new-project $MYPROJ --description="Welcome Page" --display-name="LinuxRevolution Welcome Page"
+oc new-project $MYPROJ --description="Welcome Page" --display-name="LinuxRevolution Welcome Page" || { echo "ERROR: something went wrong"; exit 9; }
 oc new-app httpd~https://github.com/cloudxabide/www_linuxrevolution_com/
 
 echo '{ "kind": "List", "apiVersion": "v1", "metadata": {}, "items": [ { "kind": "Route", "apiVersion": "v1", "metadata": { "name": "wwwlinuxrevolutioncom", "creationTimestamp": null, "labels": { "app": "wwwlinuxrevolutioncom" } }, "spec": { "host": "www.linuxrevolution.com", "to": { "kind": "Service", "name": "wwwlinuxrevolutioncom" }, "port": { "targetPort": 8080 }, "tls": { "termination": "edge" } }, "status": {} } ] }' | oc create -f -
@@ -25,10 +36,10 @@ echo '{ "kind": "List", "apiVersion": "v1", "metadata": {}, "items": [ { "kind":
 ```
 # HexGL is a HTML5 video game resembling WipeOut from back in the day (Hack the Planet!)
 MYPROJ="hexgl"
-oc new-project $MYPROJ --description="HexGL Video Game" --display-name="HexGL Game"
+oc new-project $MYPROJ --description="HexGL Video Game" --display-name="HexGL Game" || { echo "ERROR: something went wrong"; sleep 5; exit 9; }
 oc new-app php:7.3~https://github.com/cloudxabide/HexGL.git --image-stream="openshift/php:latest" --strategy=source
 
-# Wait for the build to complete
+# Wait for the build to complete (CrashLoopBackoff is "normal" for this build)
 oc get pods -w
 
 # Add a route (hexgl.linuxrevolution.com)
