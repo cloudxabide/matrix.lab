@@ -50,6 +50,13 @@ CLUSTER_NAME=ocp4-${REGION}
 BASE_DOMAIN=clouditoutloud.com
 HYPERVISOR=aws
 
+# AWS - us-gov-west-1
+AWS_DEFAULT_PROFILE="awsgc-jradtke"
+REGION=us-gov-west-1
+CLUSTER_NAME=ocp4-${REGION}
+BASE_DOMAIN=clouditoutloud.com
+HYPERVISOR=aws
+
 ### You have to reset the ENV var now that you're in the tmux session
 SHORTDATE=`date +%F`
 THEDATE=`date +%F-%H%M`
@@ -67,7 +74,14 @@ SSH_KEY=$(cat $SSH_KEY_FILE_PUB)
 PULL_SECRET_FILE=${OCP4_BASE}pull-secret.txt
 [ ! -f $PULL_SECRET_FILE ] && { echo "ERROR: Pull Secret File Not Available"; exit 9; }
 PULL_SECRET=$(cat $PULL_SECRET_FILE)
-export BASE_DOMAIN BRIDGE_NAME SSH_KEY PULL_SECRET CLUSTER_NAME
+export BASE_DOMAIN BRIDGE_NAME SSH_KEY PULL_SECRET CLUSTER_NAME AWS_DEFAULT_PROFILE
+
+case $HYPERVISOR in 
+  aws)
+    aws configure list
+  ;;
+esac
+
 
 # Create all the Directories
 [ ! -d ${OCP4_BASE} ] && { mkdir ${OCP4_BASE}; cd $_; } || { cd ${OCP4_BASE}; }
@@ -89,12 +103,16 @@ esac
 cd $INSTALL_DIR
 case `uname` in
   Linux)
-    wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux.tar.gz
-    wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
+    for FILE in openshift-install-linux.tar.gz openshift-client-linux.tar.gz
+    do
+      [ ! -f ${FILE} ] && wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/${FILE}
+    done
   ;;
   Darwin)
-    curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-mac.tar.gz -o openshift-install-mac.tar.gz
-    curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-mac.tar.gz -o openshift-client-mac.tar.gz
+    for FILE in openshift-install-mac.tar.gz openshift-client-mac.tar.gz 
+    do
+      [ ! -f ${FILE} ] && curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/${FILE} -o ${FILE}
+    done
   ;;
 esac
 
@@ -141,7 +159,7 @@ nslookup test.apps.${CLUSTER_NAME}.${BASE_DOMAIN}
 esac
 
 # Let's roll
-${INSTALL_DIR}/openshift-install create cluster --dir=${OCP4DIR}/ --log-level=debug 2&>1 ${OCP4DIR}/installation.log
+${INSTALL_DIR}/openshift-install create cluster --dir=${OCP4DIR}/ --log-level=debug 2>&1 ${OCP4DIR}/installation.log
 
 export KUBECONFIG=${OCP4DIR}/auth/kubeconfig
 ```
