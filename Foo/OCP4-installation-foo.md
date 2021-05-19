@@ -33,6 +33,11 @@ update-ca-trust extract;
 You should start your TMUX and *then* set your ENV vars
 
 ```
+#  ############
+# 
+## START HERE 
+#  
+#  ############
 ### Start your TMUX Session
 SHORTDATE=`date +%F`
 which tmux || sudo yum -y install tmux
@@ -45,13 +50,14 @@ BASE_DOMAIN=linuxrevolution.com
 HYPERVISOR=vsphere
 
 # AWS - us-east-1
+AWS_DEFAULT_PROFILE="ciol-jradtke"
 REGION=us-east-1
 CLUSTER_NAME=ocp4-${REGION}
 BASE_DOMAIN=clouditoutloud.com
 HYPERVISOR=aws
 
 # AWS - us-gov-west-1
-AWS_DEFAULT_PROFILE="awsgc-jradtke"
+AWS_DEFAULT_PROFILE="awsgc-ciol"
 REGION=us-gov-west-1
 CLUSTER_NAME=ocp4-${REGION}
 BASE_DOMAIN=clouditoutloud.com
@@ -82,7 +88,6 @@ case $HYPERVISOR in
   ;;
 esac
 
-
 # Create all the Directories
 [ ! -d ${OCP4_BASE} ] && { mkdir ${OCP4_BASE}; cd $_; } || { cd ${OCP4_BASE}; }
 [ ! -d ${OCP4DIR} ] && { mkdir ${OCP4DIR}; cd $_; } || { cd ${OCP4DIR}; }
@@ -90,6 +95,7 @@ esac
 cd $OCP4_BASE
 
 # Since my repo name does not reflect the domain I use...
+# THIS IS SOME FUTURE PROOFING HERE - for if/when I have separate repos based on domain
 case $BASE_DOMAIN in
   linuxrevolution.com)
     REPO_NAME=matrix.lab
@@ -99,24 +105,25 @@ case $BASE_DOMAIN in
   ;;
 esac
 
+REPO_NAME=matrix.lab
+
 # Download the client and installer
 cd $INSTALL_DIR
 case `uname` in
   Linux)
     for FILE in openshift-install-linux.tar.gz openshift-client-linux.tar.gz
     do
-      [ ! -f ${FILE} ] && wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/${FILE}
+      [ ! -f ${FILE} ] && { wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/${FILE}; tar -xvzf ${FILE}; }
     done
   ;;
   Darwin)
     for FILE in openshift-install-mac.tar.gz openshift-client-mac.tar.gz 
     do
-      [ ! -f ${FILE} ] && curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/${FILE} -o ${FILE}
+      [ ! -f ${FILE} ] && { curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/${FILE} -o ${FILE}; tar -xvzf ${FILE}; }
     done
   ;;
 esac
 
-for FILE in openshift-install-*.tar.gz openshift-client-*.tar.gz; do tar -xvzf $FILE; done
 ```
 
 ## Build the Installer (If you need some custom install options... otherwise, use the standard installer)
