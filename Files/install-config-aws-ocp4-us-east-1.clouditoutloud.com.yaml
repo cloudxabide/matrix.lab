@@ -4,13 +4,33 @@ compute:
 - architecture: amd64
   hyperthreading: Enabled
   name: worker
-  platform: {}
+  platform:
+    aws:
+      rootVolume:
+        iops: 2000
+        size: 500
+        type: io1
+      type: m5.xlarge
+      zones:
+      - ${REGION}a
+      - ${REGION}b
+      - ${REGION}c
   replicas: 3
 controlPlane:
   architecture: amd64
   hyperthreading: Enabled
   name: master
-  platform: {}
+  platform:
+    aws:
+      rootVolume:
+        iops: 4000
+        size: 500
+        type: io1
+      type: m5.xlarge
+      zones:
+      - ${REGION}a
+      - ${REGION}b
+      - ${REGION}c
   replicas: 3
 metadata:
   creationTimestamp: null
