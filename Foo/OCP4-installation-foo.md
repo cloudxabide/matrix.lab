@@ -49,6 +49,9 @@ CLUSTER_NAME=ocp4-mwn
 BASE_DOMAIN=linuxrevolution.com
 HYPERVISOR=vsphere
 
+# The OpenShift Installer defaults to the "default" profile
+# unsure if this is configurable.  Leaving the configuration in 
+# my config, as a placeholder (in case I figure it out)
 # AWS - us-east-1
 AWS_DEFAULT_PROFILE="ciol-jradtke"
 REGION=us-east-1
@@ -123,7 +126,6 @@ case `uname` in
     done
   ;;
 esac
-
 ```
 
 ## Build the Installer (If you need some custom install options... otherwise, use the standard installer)
@@ -166,7 +168,7 @@ nslookup test.apps.${CLUSTER_NAME}.${BASE_DOMAIN}
 esac
 
 # Let's roll
-${INSTALL_DIR}/openshift-install create cluster --dir=${OCP4DIR}/ --log-level=debug 2>&1 ${OCP4DIR}/installation.log
+${INSTALL_DIR}/openshift-install create cluster --dir=${OCP4DIR}/ --log-level=debug > ${OCP4DIR}/installation.log 2>&1 
 
 export KUBECONFIG=${OCP4DIR}/auth/kubeconfig
 ```
