@@ -54,7 +54,7 @@ HYPERVISOR=vsphere
 # my config, as a placeholder (in case I figure it out)
 # AWS - us-east-1
 AWS_DEFAULT_PROFILE="ciol-jradtke"
-REGION=us-east-1
+REGION="us-east-1"
 CLUSTER_NAME=ocp4-${REGION}
 BASE_DOMAIN=clouditoutloud.com
 HYPERVISOR=aws

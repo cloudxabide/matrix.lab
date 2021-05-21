@@ -40,7 +40,7 @@ networking:
   - cidr: 10.128.0.0/20
     hostPrefix: 23
   machineNetwork:
-  - cidr: 10.211.40.0/20
+  - cidr: 10.0.0.0/20
   networkType: OpenShiftSDN
   serviceNetwork:
   - 172.30.0.0/20
