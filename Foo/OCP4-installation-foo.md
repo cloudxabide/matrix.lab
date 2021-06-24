@@ -44,6 +44,11 @@ which tmux || sudo yum -y install tmux
 tmux new -s OCP4-${SHORTDATE}|| tmux attach -t OCP4-${SHORTDATE}
 
 ### Set ENVIRONMENT VARS
+#export VERSION=latest-4.6
+export VERSION=4.6.26
+export RELEASE_IMAGE=$(curl -s https://mirror.openshift.com/pub/openshift-v4/clients/ocp/$VERSION/release.txt | grep 'Pull From: quay.io' | awk -F ' ' '{print $3}')
+echo "RELEASE IMAGE (for $VERSION): $RELEASE_IMAGE"
+
 # VMware - mwn 
 CLUSTER_NAME=ocp4-mwn
 BASE_DOMAIN=linuxrevolution.com
@@ -116,13 +121,13 @@ case `uname` in
   Linux)
     for FILE in openshift-install-linux.tar.gz openshift-client-linux.tar.gz
     do
-      [ ! -f ${FILE} ] && { wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/${FILE}; tar -xvzf ${FILE}; }
+      [ ! -f ${FILE} ] && { wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${VERSION}/${FILE}; tar -xvzf ${FILE}; }
     done
   ;;
   Darwin)
     for FILE in openshift-install-mac.tar.gz openshift-client-mac.tar.gz 
     do
-      [ ! -f ${FILE} ] && { curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/${FILE} -o ${FILE}; tar -xvzf ${FILE}; }
+      [ ! -f ${FILE} ] && { curl https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${VERSION}/${FILE} -o ${FILE}; tar -xvzf ${FILE}; }
     done
   ;;
 esac
