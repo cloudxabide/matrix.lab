@@ -7,7 +7,7 @@ clearpart --none --initlabel
 graphical
 repo --name="AppStream" --baseurl=file:///run/install/repo/AppStream
 # Use Network installation media
--url=http://10.10.10.10/OS/rhel-8.3-x86_64/
+--url=http://10.10.10.10/OS/rhel-8.3-x86_64/
 # Use CDROM installation media
 #cdrom
 # Keyboard layouts
