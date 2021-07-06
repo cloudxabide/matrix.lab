@@ -1,4 +1,4 @@
-# OCP4 Installation (VMware/IPI)
+# OCP4 Installation (IPI - VMware/AWS)
 STATUS:  Work in Progress.  Trying to make this less dependent on the host it's running on and PULL
            everything needed for all the tasks.
          This works for me at this point, but I am definitely open to suggestions for improvement.
