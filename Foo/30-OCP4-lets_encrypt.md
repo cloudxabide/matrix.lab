@@ -17,7 +17,8 @@ Create your top-level domain (TLD) in AWS Route53 (and ONLY your TLD).  This act
 
 ## Pre-reqs
 ```
-export CERTDIR=$HOME/certificates
+SHORTDATE=`date +%F`
+export CERTDIR=$HOME/certificates/$SHORTDATE
 [ ! -d ${CERTDIR} ] && mkdir -p ${CERTDIR} 
 ```
 
@@ -57,6 +58,7 @@ issue_new_cert() {
 
 # Create the *.pem files
 ${HOME}/acme.sh/acme.sh --install-cert -d ${LE_API} -d *.${LE_WILDCARD} -d *.${LE_TLD} --cert-file ${CERTDIR}/cert.pem --key-file ${CERTDIR}/key.pem --fullchain-file ${CERTDIR}/fullchain.pem --ca-file ${CERTDIR}/ca.cer
+
 ```
 
 ## Update OpenShift 
@@ -64,7 +66,10 @@ This section details what is needed on the OCP side
 ```
 for FILE in fullchain.pem key.pem
 do 
+  echo "File:  ${CERTDIR}/$FILE"
   file ${CERTDIR}/$FILE || { echo "ERROR: $FILE not found"; }
+  openssl x509 -in ${CERTDIR}/$FILE -noout -text --dates | grep ^not
+  echo 
 done
 
 oc create secret tls router-certs --cert=${CERTDIR}/fullchain.pem --key=${CERTDIR}/key.pem -n openshift-ingress
