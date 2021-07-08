@@ -79,6 +79,12 @@ OCP4_BASE=${HOME}/OCP4/; mkdir ${OCP4_BASE}; cd $_
 OCP4DIR=${OCP4_BASE}${CLUSTER_NAME}.${BASE_DOMAIN}-${THEDATE}
 INSTALL_DIR="${OCP4_BASE}/installer-${SHORTDATE}"
 
+# Create all the Directories, if missing
+[ ! -d ${OCP4_BASE} ] && { mkdir ${OCP4_BASE}; cd $_; } || { cd ${OCP4_BASE}; }
+[ ! -d ${OCP4DIR} ] && { mkdir ${OCP4DIR}; cd $_; } || { cd ${OCP4DIR}; }
+[ ! -d ${INSTALL_DIR} ] && { mkdir ${INSTALL_DIR}; cd $_; } || { cd ${INSTALL_DIR}; }
+cd $OCP4_BASE
+
 # First, identify the files and make sure they are present
 ### SSH tweaks
 SSH_KEY_FILE="${HOME}/.ssh/id_rsa-${BASE_DOMAIN}"
@@ -98,11 +104,6 @@ case $HYPERVISOR in
   ;;
 esac
 
-# Create all the Directories
-[ ! -d ${OCP4_BASE} ] && { mkdir ${OCP4_BASE}; cd $_; } || { cd ${OCP4_BASE}; }
-[ ! -d ${OCP4DIR} ] && { mkdir ${OCP4DIR}; cd $_; } || { cd ${OCP4DIR}; }
-[ ! -d ${INSTALL_DIR} ] && { mkdir ${INSTALL_DIR}; cd $_; } || { cd ${INSTALL_DIR}; }
-cd $OCP4_BASE
 
 # Since my repo name does not reflect the domain I use...
 # THIS IS SOME FUTURE PROOFING HERE - for if/when I have separate repos based on domain
@@ -224,6 +225,12 @@ oc login -u kubeadmin -p `cat $(find $OCP4DIR/ -name kubeadmin-password)`  https
 # export KUBECONFIG=/root/OCP4/${OCP4DIR}/auth/kubeconfig
 oc get nodes
 ```
+
+### Create IAM Manifests
+cd $INSTALL_DIR
+
+./openshift-install create install-config --dir=${INSTALL_DIR}
+./openshift-install create manifests --dir=${INSTALL_DIR}
 
 ## References
 https://www.virtuallyghetto.com/2020/07/using-the-new-installation-method-for-deploying-openshift-4-5-on-vmware-cloud-on-aws.html
