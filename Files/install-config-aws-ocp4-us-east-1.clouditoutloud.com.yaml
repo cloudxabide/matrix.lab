@@ -12,9 +12,9 @@ compute:
         type: io1
       type: m5.xlarge
       zones:
-      - us-east-1a
-      - us-east-1b
-      - us-east-1c
+      - us-east-1d
+      - us-east-1e
+      - us-east-1f
   replicas: 3
 controlPlane:
   architecture: amd64
@@ -46,7 +46,7 @@ networking:
   - 172.30.0.0/20
 platform:
   aws:
-    region: $REGION
+    region:          $REGION
     userTags:
       adminContact:  jradtke@redhat.com
       costCenter:    8675309

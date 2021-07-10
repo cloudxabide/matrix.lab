@@ -176,7 +176,9 @@ nslookup test.apps.${CLUSTER_NAME}.${BASE_DOMAIN}
 esac
 
 # Let's roll
-${INSTALL_DIR}/openshift-install create cluster --dir=${OCP4DIR}/ --log-level=debug > ${OCP4DIR}/installation.log 2>&1 
+${INSTALL_DIR}/openshift-install create cluster --dir=${OCP4DIR}/ --log-level=debug 
+# or....
+# ${INSTALL_DIR}/openshift-install create cluster --dir=${OCP4DIR}/ --log-level=debug > ${OCP4DIR}/installation.log 2>&1 
 
 export KUBECONFIG=${OCP4DIR}/auth/kubeconfig
 ```

@@ -15,7 +15,7 @@ oc login --certificate-authority=$OCP4API.pem --username=`whoami` --password=$PA
 Or.. login as kubeadmin
 ```
 USERNAME=kubeadmin
-PASSWORD=$(cat $(find ${HOME}/OCP4/*mwn* -name kubeadmin-password))
+PASSWORD=$(cat $(find ${HOME}/OCP4/*mwn* -name kubeadmin-password | tail -1))
 OCP4API=api.ocp4-mwn.linuxrevolution.com
 OCP4APIPORT=6443
 echo | openssl s_client -connect $OCP4API:$OCP4APIPORT -servername $OCP4API  | sed -n /BEGIN/,/END/p > $OCP4API.pem
