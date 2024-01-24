@@ -1,0 +1,132 @@
+<!doctype html>
+<HTML LANG="en">
+<HEAD>
+<TITLE>matrix Labs Homepage | &#169 2022 LinuxRevolution</TITLE>
+<LINK REL="stylesheet" HREF="./styles.css" TYPE="text/css">
+</HEAD>
+
+<BODY>
+<div class="content">
+
+<TABLE width=800 border=1 bgcolor=f9f9f9 colspan=2>
+<TH colspan=2>Infrastructure</TH>
+<TR>
+  <TD>
+    <A HREF="https://rh8-idm-srv01.matrix.lab:443" target=newz>Red Hat Identity Management</A> <BR>
+    <A HREF="https://rh7-sat6-srv01.matrix.lab" target=newy>Red Hat Satellite 6</A> <BR>
+    <A HREF="https://rh7-ans-srv01.matrix.lab" target=newy>Red Hat Ansible</A> <BR>
+    <HR>
+    <A HREF="http://10.10.10.19/ui/dashboard" target="newab">FreeNAS WebUI</A> <BR>
+    <A HREF="http://rh8-lms-srv01.matrix.lab" target="newyz">LibreNMS - Monitoring <BR>
+    <A HREF="http://rh8-splunk-srv01.matrix.lab" target="newyzy">Splunk (not always available)<BR>
+    <HR>
+    <A HREF="http://10.10.10.10/OS/">OS Installation Source</A> <BR>
+    <A HREF="http://10.10.10.10/SFW/">Software Installation Source</A> <BR>
+    <A HREF="http://10.10.10.10/ISOS/">ISOS</A> <BR>
+    <A HREF="http://10.10.10.10/Scripts/">Scripts Directory</A> <BR>
+    <A HREF="http://10.10.10.10/Kickstart/">Kickstart Files</A> <BR>
+    <HR>
+    <A HREF="rdp://10.10.10.131/"> RDP Win-2019-Srv01 - Remote Desktop</A> <BR>
+  </TD>
+  <TD>
+  <H3 COLSPAN=3>Hardware Administration</H3> 
+    <A HREF="https://10.10.10.112/">f5 Big-IP MGMT</A> <BR>
+    <A HREF="https://10.10.10.2" target="newe">Cisco Switch Login SG300-28 </A> <BR>
+    <A HREF="https://10.10.10.3" target="newer">Cisco Switch Login LGS326-26 </A> <BR>
+    <A HREF="https://10.10.10.1:4444/">Sophos Admin Console</A> <BR>
+    <A HREF="https://10.10.10.1:443/">Sophos User Portal</A>
+  </TD> 
+</TR>
+</TABLE>
+
+<TABLE width=800 border=1 bgcolor=f9f9f9 colspan=2>
+<TH colspan=2>VMware vSphere (7.0)</TH>
+<TR>
+  <TD>
+  <H3> vSphere Management </H3>
+  <A HREF="https://vmw-vcenter7.matrix.lab:443" target="yoc">VMware vCenter Portal </A> <BR>
+  <A HREF="https://vmw-vcenter7.matrix.lab:5480/" target="yoa">vSphere Appliance Mgmt</A> <BR>
+  <A HREF="https://10.10.10.132:5480/ui/monitor/cpuandmem" target="VMcpu">VMware Monitoring Summary</A> <BR>
+  </TD>
+  <TD>
+  <H3> VMware Host Client (left to right in the rack)</H3>
+  <A HREF="https://10.10.10.15" target="tank">VMware Host Client - TANK</A> <BR>
+  <A HREF="https://10.10.10.18" target="apoc">VMware Host Client - APOC</A> <BR>
+  <A HREF="https://10.10.10.14" target="dozer">VMware Host Client - DOZER</A> <BR>
+  </TD>
+</TR>
+</TABLE>
+
+<TABLE width=800 border=1 bgcolor=f9f9f9 colspan=2>
+<TH colspan=2 align=center> OpenShift Container Platform 4 </TH>
+<TR>
+  <TD>
+    <H3>OpenShift Cluster Management - Primary</H3>
+    <A HREF="https://console-openshift-console.apps.ocp4-mwn.linuxrevolution.com" target="OCP-console">OpenShift Console for LinuxRevolution</A><BR>
+    <A HREF="">api.ocp4-mwn.linuxrevolution.com</A><BR>
+  </TD>
+  <HR>
+  <TD>
+    <H3>Single Node OpenShift</H3>
+    <A HREF="https://console-openshift-console.apps.ocp4-sno.matrix.lab" target="OCP-console-SNO">OpenShift Console for SNO</A><BR>
+  </TD>
+</TR>
+<TR>
+  <TD>
+    <H3>OpenShift Infrastructure Apps</H3>
+    <A HREF="https://grafana-openshift-monitoring.apps.ocp4-mwn.linuxrevolution.com" target="asd13f">Grafana - Cluster Metrics Dashboards</A><BR>
+    <A HREF="https://prometheus-k8s-openshift-monitoring.apps.ocp4-mwn.linuxrevolution.com" target="asdf4">Prometheus - Metrics Engine </A><BR>
+    <A HREF="https://alertmanager-main-openshift-monitoring.apps.ocp4-mwn.linuxrevolution.com" target="asdf8">AlertManager UI</A><BR>
+    <HR>
+    <A HREF="https://kibana-openshift-logging.apps.ocp4-mwn.linuxrevolution.com" target="asdf2">Kibana - EFK </A><BR>
+    <A HREF="https://thanos-querier-openshift-monitoring.apps.ocp4-mwn.linuxrevolution.com" target="asdf1">Thanos - Not Sure</A><BR>
+  </TD>
+  <TD>
+    <H3>OpenShift Supporting Services</H3>
+    <A HREF="https://console-openshift-console.apps.ocp4-acm.linuxrevolution.com" target="OCP-console-ACM">OpenShift Console for ACM Cluster</A><BR>
+    <A HREF="https://multicloud-console.apps.ocp4-acm.linuxrevolution.com/">Red Hat Advanced Cluster Management Console</A><BR>
+    <A HREF="https://matrixlab-registry-quay-quay-enterprise.apps.ocp4-mwn.linuxrevolution.com/repository/" target="khjlkjh48">Quay Registry</A><BR>
+    <A HREF="https://central-stackrox.apps.ocp4-mwn.linuxrevolution.com" target="asdf324df">Red Hat Advanced Cluster Security</A><BR>
+  </TD>
+</TR>
+<TR>
+  <TD>
+    <H3> OpenShift Initial EndPoints </H3>
+    <A HREF="https://console-openshift-console.apps.ocp4-sno.linuxrevolution.com" target="OCP-console-SNO">OpenShift Console for SNO</A><BR>
+    <A HREF="api.ocp4-mwn.linuxrevolution.com"> api.ocp4-mwn.linuxrevolution.com </A> <BR>
+    <A HREF="oauth-openshift.apps.ocp4-mwn.linuxrevolution.com"> oauth-openshift.apps.ocp4-mwn.linuxrevolution.com </A> <BR>
+    <A HREF="console-openshift-console.apps.ocp4-mwn.linuxrevolution.com"> console-openshift-console.apps.ocp4-mwn.linuxrevolution.com </A> <BR>
+    <A HREF="grafana-openshift-monitoring.apps.ocp4-mwn.linuxrevolution.com"> grafana-openshift-monitoring.apps.ocp4-mwn.linuxrevolution.com </A> <BR>
+    <A HREF="thanos-querier-openshift-monitoring.apps.ocp4-mwn.linuxrevolution.com"> thanos-querier-openshift-monitoring.apps.ocp4-mwn.linuxrevolution.com </A> <BR>
+    <A HREF="prometheus-k8s-openshift-monitoring.apps.ocp4-mwn.linuxrevolution.com"> prometheus-k8s-openshift-monitoring.apps.ocp4-mwn.linuxrevolution.com </A> <BR>
+    <A HREF="alertmanager-main-openshift-monitoring.apps.ocp4-mwn.linuxrevolution.com"> alertmanager-main-openshift-monitoring.apps.ocp4-mwn.linuxrevolution.com </A> <BR>
+</TR>
+</TABLE>
+
+<TABLE width=800 border=1 bgcolor=f9f9f9 colspan=2>
+<TH>Hosted Applications and Reference</TH>
+<TR>
+  <TD>
+  <H3>LinuxRevolution</H3>
+    <A HREF="https://hexgl.linuxrevolution.com" target="newz">HexGL Video Game - Test App</A> <BR>
+    <A HREF="https://www.linuxrevolution.com/" target="newz">Homepage (SSL Enabled)</A> <BR>
+    <A HREF="https://github.com/cloudxabide/matrix.lab" target="newz">Git Repo for the HomeLab</A> <BR>
+    <A HREF="https://github.com/cloudxabide/www_linuxrevolution_com" target="newz">Git Repo for the HomePage (www.linxurevolution.com)</A> <BR>
+  </TD>
+</TR>
+</TABLE>
+
+<TABLE width=800 border=1 bgcolor=f9f9f9 colspan=2>
+<TH colspan=2>Vendor Links</TH>
+<TR>
+  <TD colspan=2>
+    <A HREF="https://cloud.redhat.com/insights/#SIDs=&tags=">Red Hat Insights Dashboard</A> <BR>
+    <A HREF="https://console.redhat.com/openshift/install/pull-secret">Red Hat Pull Secret</A> <BR>
+    <A HREF="https://cloud.redhat.com/">Red Hat Cloud Console</A> <BR>
+  </TD>
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>
+

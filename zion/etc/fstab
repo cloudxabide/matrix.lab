@@ -1,0 +1,24 @@
+
+#
+# /etc/fstab
+# Created by anaconda on Sat Mar 25 14:25:41 2023
+#
+# Accessible filesystems, by reference, are maintained under '/dev/disk/'.
+# See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info.
+#
+# After editing this file, run 'systemctl daemon-reload' to update systemd
+# units generated from this file.
+#
+/dev/mapper/rhel-root   /                       xfs     defaults        0 0
+UUID=8420d6c2-852e-468e-a40e-987eac909a7f /boot                   xfs     defaults        0 0
+/dev/mapper/rhel-swap   none                    swap    defaults        0 0
+# NON-Root Mounts
+/dev/mapper/vg_data-lv_data /data xfs defaults 0 0
+
+#  ISO mounts
+/data/ISOS/rhel-8.5-x86_64-dvd.iso /var/www/OS/rhel-8.5-x86_64 iso9660 defaults,nofail 0 0
+/data/ISOS/rhel-8.7-x86_64-dvd.iso /var/www/OS/rhel-8.7-x86_64 iso9660 defaults,nofail 0 0
+/data/ISOS/rhel-baseos-9.1-x86_64-dvd.iso /var/www/OS/rhel-baseos-9.1-x86_64 iso9660 defaults,nofail 0 0
+/data/ISOS/ubuntu-22.04.2-live-server-amd64.iso /var/www/OS/ubuntu-22.04.2-live-server-amd64 iso9660 defaults,nofail 0 0
+
+/data/tftpboot /var/lib/tftpboot none bind,defaults 0 0

@@ -1,0 +1,23 @@
+---
+apiVersion: project.openshift.io/v1
+kind: Project
+metadata:
+  name: rhacs-operator
+  annotations:
+    openshift.io/description: Red Hat Advanced Cluster Security Operator
+    openshift.io/display-name: Red Hat Advanced Cluster Security
+    openshift.io/sa.scc.mcs: s0:c26,c25
+    openshift.io/sa.scc.supplemental-groups: 1000700000/10000
+    openshift.io/sa.scc.uid-range: 1000700000/10000
+    openshift.io/node-selector: 'node-role.kubernetes.io/infra='
+    scheduler.alpha.kubernetes.io/defaultTolerations: >-
+      [{"operator": "Exists", "effect": "NoSchedule", "key":
+      "node-role.kubernetes.io/infra"}, 
+        {"operator": "Exists", "effect": "NoExecute", "key":
+      "node-role.kubernetes.io/infra"}
+      ]
+  labels:
+    kubernetes.io/metadata.name: rhacs-operator
+spec:
+  finalizers:
+  - kubernetes

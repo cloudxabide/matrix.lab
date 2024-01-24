@@ -1,0 +1,28 @@
+---
+apiVersion: v1 
+baseDomain: '$BASE_DOMAIN'
+compute:
+- hyperthreading: Enabled
+  name: worker
+  replicas: 0
+controlPlane:
+  hyperthreading: Enabled
+  name: master
+  replicas: 1
+metadata:
+  name: '$CLUSTER_NAME'
+networking:
+  machineNetwork:
+  - cidr: 10.10.10.0/24
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  networkType: OVNKubernetes
+  serviceNetwork:
+  - 172.30.0.0/16
+platform: 
+  none: {}
+bootstrapInPlace:
+  installationDisk: /dev/sda
+pullSecret: '$PULL_SECRET'
+sshKey: '$SSH_KEY'

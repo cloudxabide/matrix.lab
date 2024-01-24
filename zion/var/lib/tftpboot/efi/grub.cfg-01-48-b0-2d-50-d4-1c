@@ -1,0 +1,42 @@
+### BEGIN /etc/grub.d/00_header ###
+set default="0"
+
+function load_video {
+  if [ x$feature_all_video_module = xy ]; then
+    insmod all_video
+  else
+    insmod efi_gop
+    insmod efi_uga
+    insmod ieee1275_fb
+    insmod vbe
+    insmod vga
+    insmod video_bochs
+    insmod video_cirrus
+  fi
+}
+
+load_video
+set gfxpayload=keep
+insmod gzio
+insmod part_gpt
+insmod ext2
+
+set timeout=10
+### END /etc/grub.d/00_header ###
+
+#search --no-floppy --set=root -l 'Fedora-WS-Live-35-1-2'
+
+### BEGIN /etc/grub.d/10_linux ###
+menuentry 'Install Fedora-Workstation-Live 35 in text mode' --class red --class gnu-linux --class gnu --class os {
+  linux Fedora-35-aarch64/vmlinuz inst.ks=http://10.10.10.10/Kickstart/XAVIER-Fedora-35-aarch64.ks nomodeset inst.text inst.gpt net.ifnames=0 console=ttyTCU0,115200 ip=dhcp inst.stage2=http://10.10.10.10/OS/Fedora-35-aarch64/LiveOS/squashfs.img inst.repo=http://10.10.10.10/OS/Fedora-35-aarch64/ 
+initrd Fedora-35-aarch64/initrd.img
+}
+menuentry 'Rescue Fedora-Workstation-Live 35 in basic graphics mode' --class red --class gnu-linux --class gnu --class os {
+  linux Fedora-35-aarch64/vmlinuz  rd.live.image:http:http://10.10.10.10/OS/Fedora-35-aarch64/LiveOS/squashfs.img nomodeset quiet rhgb
+  initrd Fedora-35-aarch64/initrd.img
+}
+menuentry 'Install Red Hat Enterprise Linux 8.7' --class red --class gnu-linux --class gnu --class os {
+  linux rhel-8.7-aarch64/vmlinuz inst.stage2=http://10.10.10.10/OS/rhel-8.7-aarch64 inst.ks=http://10.10.10.10/Kickstart/XAVIER-RHEL8.ks ip=10.10.10.55::10.10.10.1:255.255.255.0:xavier.jetsons.lab:eth0:none inst.text console=ttyTCU0,115200 inst.gpt video=tegrafb earlycon=tegra_comb_uart,mmio32,0x0c168000 gpt rootfs.slot_suffix= usbcore.old_scheme_first=1 tegraid=19.1.2.0.0 maxcpus=6 boot.slot_suffix= boot.ratchetvalues=0.4.2 vpr_resize sdhci_tegra.en_boot_part_access=1 quiet rw rootwait rootfstype=ext4 console=ttyTCU0,115200n8 console=tty0 fbcon=map:0 net.ifnames=0 noipv6
+  #linux rhel-8.7-aarch64/vmlinuz inst.stage2=hd:LABEL=RHEL-8.7-0-BaseOS-aarch64 ro inst.repo=http://10.10.10.10/OS/rhel-8.7-aarch64/ inst.ks=http://10.10.10.10/Kickstart/XAVIER.ks ip=10.10.10.55::10.10.10.1:255.255.255.0:xavier.jetsons.lab:eno1:none inst.text inst.repo=http://10.10.10.10/OS/rhel-8.7-aarch64 
+  initrd rhel-8.7-aarch64/initrd.img
+}

@@ -1,0 +1,40 @@
+apiVersion: v1
+baseDomain: linuxrevolution.com
+compute:
+- architecture: amd64
+  hyperthreading: Enabled
+  name: worker
+  platform: {}
+  replicas: 3
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: ocp4-acm
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 10.0.0.0/16
+  networkType: OpenShiftSDN
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  vsphere:
+    apiVIP: 10.10.10.171
+    cluster: Infra 
+    datacenter: PisgahForest 
+    defaultDatastore: apoc-datastore
+    ingressVIP: 10.10.10.172
+    network: VM Network HA
+    password: NotAPassword 
+    username: administrator@vsphere.matrix.lab
+    vCenter: vmw-vcenter6.matrix.lab
+publish: External
+pullSecret: '$PULL_SECRET'
+sshKey: '$SSH_KEY'

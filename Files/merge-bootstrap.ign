@@ -1,0 +1,18 @@
+{
+  "ignition": {
+    "config": {
+      "merge": [
+        {
+          "source": "http://10.10.10.10/bootstrap/bootstrap.ign",
+          "verification": {}
+        }
+      ]
+    },
+    "timeouts": {},
+    "version": "3.2.0"
+  },
+  "networkd": {},
+  "passwd": {},
+  "storage": {},
+  "systemd": {}
+}

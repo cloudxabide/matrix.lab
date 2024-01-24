@@ -1,0 +1,13 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfigPool
+metadata:
+  name: worker-rhel
+spec:
+  machineConfigSelector:
+    matchExpressions:
+      - {key: machineconfiguration.openshift.io/role, operator: In, values: [worker]}
+      - {key: node.openshift.io/os_id, operator: NotIn, values: [rhcos]}
+  nodeSelector:
+    matchLabels:
+      node-role.kubernetes.io/worker: ""
+      node.openshift.io/os_id: rhel

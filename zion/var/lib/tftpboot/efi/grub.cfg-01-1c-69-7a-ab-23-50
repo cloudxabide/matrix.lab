@@ -1,0 +1,84 @@
+set default="0"
+set timeout=10
+
+function load_video {
+  insmod efi_gop
+  insmod efi_uga
+  insmod video_bochs
+  insmod video_cirrus
+  insmod all_video
+}
+
+load_video
+insmod gzio
+insmod part_gpt
+insmod ext2
+loadfont unicode
+
+set gfxpayload=keep
+set gfxmode=auto
+insmod gfxterm
+terminal_output gfxterm
+insmod gfxmenu
+
+set menu_color_normal=white/black
+set menu_color_highlight=black/light-gray
+background_image -m stretch /bg.jpg
+
+menuentry "Reboot (after timeout, if no option is selected)" --class exit {
+  reboot
+}
+
+submenu 'Red Hat Enterprise Linux 8 -->' {
+  set menu_color_highlight=red/light-gray
+  set menu_color_normal=white/black
+  set color_normal=white/black
+
+  menuentry 'Install Red Hat Enterprise Linux 8.7 - Kickstart' --class fedora --class gnu-linux --class gnu --class os {
+    linuxefi rhel-8.7-x86_64/vmlinuz ip=dhcp inst.gpt inst.ks=http://10.10.10.10/Kickstart/NEO-8.7.ks inst.repo=http://10.10.10.10/OS/rhel-8.7-x86_64/ text
+        initrdefi rhel-8.7-x86_64/initrd.img
+  }
+  menuentry 'Test this media & install Red Hat Enterprise Linux 8.7' --class fedora --class gnu-linux --class gnu --class os {
+        linuxefi rhel-8.7-x86_64/vmlinuz inst.stage2=hd:LABEL=RHEL-8.7-0-BaseOS-x86_64 rd.live.check quiet ip=dhcp inst.gpt inst.ks=http://10.10.10.10/Kickstart/rh8-test-srv01.ks inst.repo=http://10.10.10.10/OS/rhel-8.7-x86_64/
+        initrdefi rhel-8.7-x86_64/initrd.img
+  }
+}
+
+submenu 'Red Hat Enterprise Linux 7 -->' {
+  set menu_color_highlight=red/light-gray
+  set menu_color_normal=white/black
+  set color_normal=white/black
+  menuentry 'Install Red Hat Enterprise Linux 7.9' --class fedora --class gnu-linux --class gnu --class os {
+    linuxefi rhel-server-7.9-x86_64/vmlinuz
+    initrdefi rhel-server-7.9-x86_64/initrd.img
+  }
+}
+
+submenu 'Ubuntu Server --> ' {
+  set menu_color_highlight=yellow/cyan
+  set menu_color_normal=white/black
+  set color_normal=white/black
+  menuentry "Install Ubuntu Server (22.04.2)" {
+    set gfxpayload=keep
+    linux   ubuntu-22.04.2-live-server-amd64/vmlinuz url=http://10.10.10.10/ISOS/ubuntu-22.04.2-live-server-amd64.iso root=/dev/ram0 ramdisk_size=1500000 autoinstall "ds=nocloud-net;s=http://10.10.10.10/Kickstart/NEO/" cloud-config-url=/dev/null ip=dhcp only-ubiquity ---
+    initrd  ubuntu-22.04.2-live-server-amd64/initrd
+  }
+  # linux   /ubuntu-22.04.2-desktop-amd64/vmlinuz url=http://10.10.10.10/ISOS/ubuntu-22.04.2-desktop-amd64.iso only-ubiquity ip=dhcp ---
+
+  menuentry "Try or Install Ubuntu" {
+    set gfxpayload=keep
+    linux       /casper/vmlinuz url=http://10.10.10.10/ISOS/ubuntu-22.04.2-live-server-amd64.iso maybe-ubiquity quiet splash ---
+    initrd      /casper/initrd
+  }
+}
+
+grub_platform
+if [ "$grub_platform" = "efi" ]; then
+menuentry 'UEFI Firmware Settings (reboot to BIOS)' {
+	fwsetup
+}
+else
+menuentry 'Test memory' {
+	linux16 memtest86+.bin
+}
+fi

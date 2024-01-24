@@ -1,0 +1,129 @@
+---
+# cloud-config
+# vim: ft=yaml:
+autoinstall:
+  version: 1
+  early-commands:
+    - ['cat', '/autoinstall.yaml']
+  refresh-installer:
+    update: true
+  apt:
+    geoip: true
+    preserve_sources_list: false
+    primary:
+      - arches: [amd64, i386]
+        uri: http://us.archive.ubuntu.com/ubuntu
+      - arches: [default]
+        uri: http://ports.ubuntu.com/ubuntu-ports
+    sources:
+      git-ppa:
+        source: ppa:git-core/ppa
+  # Enabling this breaks the install at configuring grub
+  # conf: |
+  #  APT::Install-Recommends 'false';
+  # Place any extra packages you know you want here. Keep in mind it will install
+  # recommended packages so maybe hold off until install is finished
+  packages:
+    - git
+  identity:
+    hostname: morpheus
+  users:
+    - gecos: mansible
+      groups: [adm, sudo]
+      password: "$6$03gqrB.BA2aR.mkG$gSzJgslhseoNAe1GojYe8uQG1/mavSGIVf62BDA9MtQkRr06Ua9AXYspTOsdJ61d1QUmEhojWQ7RG.oZeWyu9/"
+      realname: 'My Ansible'
+      shell: /bin/bash
+  keyboard:
+    layout: us
+    toggle: ''
+    variant: ''
+  locale: en_US
+  # Default to use dhcp
+  # network:
+  #   ethernets:
+  #     enp0s3: {dhcp4: true}
+  #   version: 2
+  # Enter your apt cache server (have used apt-cacher-ng from 18.04 successfully)
+  # proxy: http://example.com:3142/
+  ssh:
+    allow-pw: true
+    authorized-keys: ["ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBAA+bokxMVtwe6NSASyZJPFbx4OIsImY9W2C9X3kH/80lbMOd7XR3E7naduNbZC9hmmov+k1IhqZaHK7PEKFHUVYwwFi756tViA10ede1WKm1dMav2WDi9AXrIUZSZ0es6ejQL8IbQnpqhlb5c2dkiJQIgPhpTsDskI0qmqPyY86mlTSoQ== jradtke@blackmesa.evil.corp"]
+    install-server: true
+  storage:
+    config:
+      -
+        id: disk-sda
+        type: disk
+        grub_device: true
+        name: ""
+        path: /dev/sda
+        match:
+          size: largest
+        preserve: false
+        ptable: gpt
+        wipe: superblock
+      -
+        id: partition-0
+        type: partition
+        device: disk-sda
+        flag: bios_grub
+        number: 1
+        preserve: false
+        size: 1048576
+      -
+        id: partition-1
+        type: partition
+        device: disk-sda
+        flag: ""
+        number: 2
+        preserve: false
+        size: 1073741824
+        wipe: superblock
+      -
+        id: format-0
+        type: format
+        fstype: ext4
+        preserve: false
+        volume: partition-1
+      -
+        id: partition-2
+        type: partition
+        device: disk-sda
+        number: 3
+        preserve: false
+        flag: ""
+        size: -1
+        wipe: superblock
+      -
+        id: lvm_volgroup-0
+        type: lvm_volgroup
+        devices:
+          - partition-2
+        name: vg0
+        preserve: false
+      -
+        id: lvm_partition-0
+        type: lvm_partition
+        name: root
+        preserve: false
+        size: 4294967296B
+        volgroup: lvm_volgroup-0
+      -
+        id: format-1
+        type: format
+        fstype: ext4
+        preserve: false
+        volume: lvm_partition-0
+      -
+        id: mount-1
+        type: mount
+        device: format-1
+        path: /
+      -
+        id: mount-0
+        type: mount
+        device: format-0
+        path: /boot
+  late-commands:
+    - "echo 'APT::Install-Recommends \"false\";' >/target/etc/apt/apt.conf.d/02InstallRecommends"
+    - "echo 'morpheus ALL=(ALL:ALL) NOPASSWD: ALL' > /etc/sudoers.d/morpheus"

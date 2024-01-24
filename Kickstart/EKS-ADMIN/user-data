@@ -1,0 +1,138 @@
+#cloud-config
+autoinstall:
+  apt:
+    disable_components: []
+    geoip: true
+    preserve_sources_list: false
+    primary:
+    - arches:
+      - amd64
+      - i386
+      uri: http://us.archive.ubuntu.com/ubuntu
+    - arches:
+      - default
+      uri: http://ports.ubuntu.com/ubuntu-ports
+  drivers:
+    install: false
+  identity:
+    hostname: neo
+    password: $6$SLW4dob4gZpfxZHM$F6zSB9uyfrHF5HxZUB/N1ChqWkSaZ5aVBtyqFHp/W/tdPMWC0XyvSdJwfFa8ad.WaAO7VlyPD282tO/628yWR0
+    realname: My Ansible
+    username: mansible
+  kernel:
+    package: linux-generic
+  keyboard:
+    layout: us
+    toggle: null
+    variant: ''
+  locale: en_US.UTF-8
+  network:
+    ethernets:
+      eno1:
+        critical: true
+        dhcp-identifier: mac
+        dhcp4: true
+        nameservers:
+          addresses:
+          - 10.10.10.121
+          - 10.10.10.122
+          search:
+          - matrix.lab.
+    version: 2
+    wifis: {}
+  snaps:
+  - channel: stable
+    classic: false
+    name: docker
+  - channel: stable
+    classic: false
+    name: prometheus
+  source:
+    id: ubuntu-server
+    search_drivers: false
+  ssh:
+    allow-pw: true
+    authorized-keys: []
+    install-server: true
+  storage:
+    config:
+    - ptable: gpt
+      #serial: SanDisk_SDSSDXPS960G_145184400370
+      #wwn: '0x5001b44cd93f1ff2'
+      path: /dev/nvme0n1
+      wipe: superblock-recursive
+      preserve: false
+      name: ''
+      grub_device: false
+      type: disk
+      id: disk-nvme0n1
+    - device: disk-nvme0n1
+      size: 1127219200
+      wipe: superblock
+      flag: boot
+      number: 1
+      preserve: false
+      grub_device: true
+      offset: 1048576
+      type: partition
+      id: partition-0
+    - fstype: fat32
+      volume: partition-0
+      preserve: false
+      type: format
+      id: format-0
+    - device: disk-nvme0n1
+      size: 2147483648
+      wipe: superblock
+      number: 2
+      preserve: false
+      grub_device: false
+      offset: 1128267776
+      type: partition
+      id: partition-1
+    - fstype: ext4
+      volume: partition-1
+      preserve: false
+      type: format
+      id: format-1
+    - device: disk-nvme0n1
+      size: 956919971840
+      wipe: superblock
+      number: 3
+      preserve: false
+      grub_device: false
+      offset: 3275751424
+      type: partition
+      id: partition-2
+    - name: ubuntu-vg
+      devices:
+      - partition-2
+      preserve: false
+      type: lvm_volgroup
+      id: lvm_volgroup-0
+    - name: ubuntu-lv
+      volgroup: lvm_volgroup-0
+      size: 107374182400B
+      wipe: superblock
+      preserve: false
+      type: lvm_partition
+      id: lvm_partition-0
+    - fstype: ext4
+      volume: lvm_partition-0
+      preserve: false
+      type: format
+      id: format-2
+    - path: /
+      device: format-2
+      type: mount
+      id: mount-2
+    - path: /boot
+      device: format-1
+      type: mount
+      id: mount-1
+    - path: /boot/efi
+      device: format-0
+      type: mount
+      id: mount-0
+  updates: security
+  version: 1

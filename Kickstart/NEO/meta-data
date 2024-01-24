@@ -1,0 +1,10 @@
+---
+# instance-id: iid-abcdefg
+network-interfaces: |
+  iface eno1 inet static
+  address 10.10.10.11
+  network 10.10.10.0
+  netmask 255.255.255.0
+  broadcast 10.10.10.255
+  gateway 10.10.10.1
+hostname: neo

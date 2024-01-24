@@ -1,0 +1,58 @@
+---
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  creationTimestamp: null
+  labels:
+    machine.openshift.io/cluster-api-cluster: '$INFRASTRUCTURE_ID' 
+  name: '$INFRASTRUCTURE_ID-$ROLE' 
+  namespace: openshift-machine-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: '$INFRASTRUCTURE_ID' 
+      machine.openshift.io/cluster-api-machineset: '$INFRASTRUCTURE_ID-$ROLE' 
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        machine.openshift.io/cluster-api-cluster: '$INFRASTRUCTURE_ID' 
+        machine.openshift.io/cluster-api-machine-role: '$ROLE'
+        machine.openshift.io/cluster-api-machine-type: '$TYPE' 
+        machine.openshift.io/cluster-api-machineset: '$INFRASTRUCTURE_ID-$ROLE' 
+    spec:
+      taints:
+      - effect: NoSchedule
+        key: node.ocs.openshift.io/storage
+        value: "true"
+      metadata:
+        creationTimestamp: null
+        labels:
+          node-role.kubernetes.io/infra: "" 
+          cluster.ocs.openshift.io/openshift-storage: ""
+      providerSpec:
+        value:
+          apiVersion: vsphereprovider.openshift.io/v1beta1
+          credentialsSecret:
+            name: vsphere-cloud-credentials
+          diskGiB: 120
+          kind: VSphereMachineProviderSpec
+          memoryMiB: 26624 
+          metadata:
+            creationTimestamp: null
+          network:
+            devices:
+            - networkName: DPortGroup-Guests
+          numCPUs: 10 
+          numCoresPerSocket: 10 
+          snapshot: ""
+          template: '$INFRASTRUCTURE_ID-rhcos'
+          userDataSecret:
+            name: worker-user-data
+          workspace:
+            datacenter: PisgahForest
+            datastore: ds-iscsi-ssd-400
+            folder: '/PisgahForest/vm/$INFRASTRUCTURE_ID'
+            resourcepool: '/PisgahForest/host/HomeLab/Resources'
+            server: vmw-vcenter6.matrix.lab

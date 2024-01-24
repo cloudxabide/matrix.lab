@@ -1,0 +1,19 @@
+---
+#cloud-config
+growpart:
+  mode: 'off'
+locale: en_US.UTF-8
+preserve_hostname: true
+resize_rootfs: false
+snap:
+  commands:
+  - snap install --channel=stable docker
+  - snap install --channel=stable prometheus
+ssh_pwauth: true
+users:
+- gecos: My Ansible
+  groups: adm,cdrom,dip,lxd,plugdev,sudo
+  lock_passwd: false
+  name: mansible
+  passwd: $6$KvQP5pMLiSwNlwfu$3Yu.f2W2UTutV58b1nGqTF26VnPSF6SK6Gu9loMW6Pz/U2uF1/FiNXycTlniVXaJKPLoOshbGTYCWKil5GFzA1
+  shell: /bin/bash

@@ -1,0 +1,28 @@
+apiVersion: v1
+baseDomain: linuxrevolution.com
+compute:
+- hyperthreading: Enabled
+  architecture: amd64
+  name: worker
+  replicas: 0
+controlPlane:
+  hyperthreading: Enabled
+  architecture: amd64
+  name: master
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: ocp4-mwn
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  networkType: OpenShiftSDN
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  none: {}
+fips: false
+publish: External
+pullSecret: '$PULL_SECRET'
+sshKey: '$SSH_KEY'
