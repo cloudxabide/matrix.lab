@@ -22,7 +22,7 @@ sati.matrix.lab
 #apoc.matrix.lab
 
 [virtual_machines_el8]
-rh8-lms-srv01.matrix.lab
+#rh8-lms-srv01.matrix.lab
 rh8-util-srv01.matrix.lab
 #rh8-util-srv02.matrix.lab
 zion.matrix.lab
